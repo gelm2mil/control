@@ -3,277 +3,222 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Control de Asistencia — PMT</title>
 
+<!-- CSS EXTERNO -->
+<link rel="stylesheet" href="styles.css">
+
+<!-- ICONOS PWA -->
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+
+<!-- LIBRERÍAS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-<style>
-:root{
-  --c1:#00eaff;
-  --c2:#00ffc8;
-  --bg:#020510;
-  --card:rgba(3,5,25,.96);
-  --txt:#e9f9ff;
-}
-body{
-  margin:0;
-  font-family:Segoe UI,system-ui;
-  background:radial-gradient(circle at 0 0,#28d7ff 0,#150027 45%,#050109 100%);
-  color:var(--txt);
-  display:flex;
-  justify-content:center;
-}
-.panel{
-  width:100%;
-  max-width:1000px;
-  margin:20px;
-  padding:25px;
-  background:var(--card);
-  border-radius:28px;
-  border:2px solid rgba(0,255,191,.35);
-  box-shadow:0 0 40px rgba(0,255,191,.35);
-}
-h1{
-  text-align:center;
-  color:var(--c2);
-  letter-spacing:.15em;
-}
-.sub{
-  text-align:center;
-  font-size:12px;
-  opacity:.7;
-}
-.section{
-  margin-top:18px;
-  border:1px solid rgba(0,255,191,.25);
-  border-radius:18px;
-  padding:15px;
-}
-label{
-  font-size:.7rem;
-  color:#9cb3d8;
-  text-transform:uppercase;
-}
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:10px;
-}
-input,select,textarea{
-  width:100%;
-  padding:10px;
-  border-radius:10px;
-  border:1px solid var(--c1);
-  background:#000;
-  color:#fff;
-}
-textarea{resize:vertical;}
-canvas{
-  background:#fff;
-  border-radius:10px;
-  width:100%;
-  height:140px;
-}
-.actions{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-  gap:12px;
-  margin-top:20px;
-}
-button{
-  padding:14px;
-  border-radius:999px;
-  border:none;
-  font-weight:bold;
-  cursor:pointer;
-}
-.btn-save{background:linear-gradient(90deg,#00eaff,#00ffc8);color:#001;}
-.btn-pdf{background:linear-gradient(90deg,#8f00ff,#ff0055);color:#fff;}
-.btn-word{background:#0d6efd;color:#fff;}
-.btn-excel{background:#28a745;color:#fff;}
-.btn-del{background:#ff0033;color:#fff;}
-table{
-  width:100%;
-  margin-top:20px;
-  border-collapse:collapse;
-  font-size:.8rem;
-}
-th{
-  background:var(--c1);
-  color:#001;
-  padding:8px;
-}
-td{
-  padding:8px;
-  border-bottom:1px solid rgba(0,255,191,.2);
-}
-footer{
-  margin-top:20px;
-  text-align:center;
-  font-size:10px;
-  opacity:.6;
-}
-</style>
 </head>
-
 <body>
-<div class="panel">
-<h1>CONTROL DE ASISTENCIA — PMT</h1>
-<div class="sub" id="fechaHora"></div>
 
-<div class="section grid">
-  <div>
-    <label>Nombre del Elemento</label>
-    <input id="nombre">
+<div class="contenedor">
+
+  <!-- ENCABEZADO -->
+  <div class="header-top">
+    <div class="logo-box">
+      <img src="icons/icon-192.png" alt="PMT">
+    </div>
+
+    <div class="titulos">
+      <div class="titulos-linea1">CONTROL DE ASISTENCIA — PMT</div>
+      <div class="titulos-linea3" id="fechaHora"></div>
+      <div class="titulos-linea4">Sistema GELM 2026</div>
+    </div>
+
+    <div class="logo-box">
+      <img src="icons/icon-512.png" alt="GELM">
+    </div>
   </div>
-  <div>
-    <label>Cargo</label>
-    <select id="cargo">
-      <option>Comisario General</option>
-      <option>Subdirector</option>
-      <option>Subcomisario</option>
-      <option>Oficial</option>
-      <option>Secretario</option>
-    </select>
+
+  <!-- FORMULARIO -->
+  <div class="panel">
+
+    <div class="section grid">
+      <div>
+        <label>Nombre del elemento</label>
+        <input id="nombre">
+      </div>
+
+      <div>
+        <label>Cargo</label>
+        <select id="cargo">
+          <option>Comisario General</option>
+          <option>Subdirector</option>
+          <option>Subcomisario</option>
+          <option>Oficial</option>
+          <option>Secretario</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Grupo</label>
+        <select id="grupo">
+          <option>Dirección</option>
+          <option>Transportes</option>
+          <option>Vía Pública</option>
+          <option>Grupo A</option>
+          <option>Grupo B</option>
+          <option>Oficina</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Tipo de registro</label>
+        <select id="tipo">
+          <option>Entrada</option>
+          <option>Salida</option>
+          <option>Salida Almuerzo</option>
+          <option>Regreso Almuerzo</option>
+          <option>Permiso</option>
+          <option>Vacaciones</option>
+          <option>IGSS</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="section">
+      <label>Observación (obligatoria si aplica)</label>
+      <textarea id="obs" rows="2"></textarea>
+    </div>
+
+    <div class="section">
+      <label>Firma del elemento</label>
+      <canvas id="firma"></canvas>
+    </div>
+
+    <div class="actions">
+      <button class="btn-save" onclick="guardar()">Guardar Registro</button>
+      <button class="btn-pdf" onclick="pdf()">PDF Diario</button>
+      <button class="btn-word" onclick="word()">Word</button>
+      <button class="btn-excel" onclick="excel()">Excel</button>
+      <button class="btn-del" onclick="borrar()">Borrar Todo</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Hora</th>
+          <th>Nombre</th>
+          <th>Cargo</th>
+          <th>Grupo</th>
+          <th>Tipo</th>
+        </tr>
+      </thead>
+      <tbody id="tabla"></tbody>
+    </table>
+
+    <div class="pie">
+      © 2026 — Sistema GELM — Desarrollo y propiedad intelectual reservados
+    </div>
+
   </div>
-  <div>
-    <label>Grupo</label>
-    <select id="grupo">
-      <option>Dirección</option>
-      <option>Subdirección</option>
-      <option>Transportes</option>
-      <option>Vía Pública</option>
-      <option>Grupo A</option>
-      <option>Grupo B</option>
-      <option>Oficina</option>
-    </select>
-  </div>
-  <div>
-    <label>Tipo de Registro</label>
-    <select id="tipo">
-      <option>Entrada</option>
-      <option>Salida</option>
-      <option>Almuerzo</option>
-      <option>Regreso Almuerzo</option>
-      <option>Comisión</option>
-      <option>IGSS</option>
-      <option>Vacaciones</option>
-      <option>Permiso</option>
-      <option>Ausente</option>
-    </select>
-  </div>
-</div>
-
-<div class="section">
-<label>Observación (obligatoria para IGSS, permiso, vacaciones, comisión)</label>
-<textarea id="obs" rows="2"></textarea>
-</div>
-
-<div class="section">
-<label>Firma del Elemento</label>
-<canvas id="firma"></canvas>
-</div>
-
-<div class="actions">
-<button class="btn-save" onclick="guardar()">Guardar Registro</button>
-<button class="btn-pdf" onclick="pdf()">PDF Diario</button>
-<button class="btn-word" onclick="word()">Word</button>
-<button class="btn-excel" onclick="excel()">Excel</button>
-<button class="btn-del" onclick="borrar()">Borrar Todo</button>
-</div>
-
-<table>
-<thead>
-<tr>
-<th>Fecha</th><th>Hora</th><th>Nombre</th><th>Cargo</th><th>Grupo</th><th>Tipo</th>
-</tr>
-</thead>
-<tbody id="tabla"></tbody>
-</table>
-
-<footer>© 2026 — Sistema GELM — Desarrollo y propiedad intelectual reservados</footer>
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxxZNdpp_YF-ZoDygwRbmkAP-jsMBI3Cdsq64aozRjS6Lk0DCSvriBtRmRAoPicZ3hpNQ/exec";
-const KEY = "asistencia_gelm_2026";
-let db = JSON.parse(localStorage.getItem(KEY) || "[]");
+/* ===============================
+   FECHA Y HORA AUTOMÁTICA
+================================ */
+function actualizarHora(){
+  const f=new Date();
+  document.getElementById("fechaHora").innerText =
+    f.toLocaleDateString("es-GT",{weekday:'long',year:'numeric',month:'long',day:'numeric'}) +
+    " — " + f.toLocaleTimeString("es-GT");
+}
+setInterval(actualizarHora,1000);
+actualizarHora();
 
-// FECHA HORA
-setInterval(()=>{
-  const d=new Date();
-  fechaHora.innerText=d.toLocaleDateString("es-GT",{weekday:"long",year:"numeric",month:"long",day:"numeric"})+
-  " — "+d.toLocaleTimeString();
-},1000);
-
-// FIRMA
-const canvas=firma,ctx=canvas.getContext("2d");
-canvas.width=canvas.offsetWidth;canvas.height=canvas.offsetHeight;
-ctx.lineWidth=2;let dib=false;
-canvas.onmousedown=e=>{dib=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);}
-canvas.onmousemove=e=>{if(dib){ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();}}
+/* ===============================
+   FIRMA
+================================ */
+const c=document.getElementById("firma");
+const ctx=c.getContext("2d");
+c.width=c.offsetWidth;
+c.height=140;
+let dib=false;
+c.onmousedown=e=>{dib=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);}
+c.onmousemove=e=>{if(dib){ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();}}
 window.onmouseup=()=>dib=false;
 
-// GUARDAR
-async function guardar(){
-  if(!nombre.value) return alert("Nombre obligatorio");
+/* ===============================
+   BASE LOCAL
+================================ */
+const KEY="ASISTENCIA_PMT_GELM";
+let db=JSON.parse(localStorage.getItem(KEY)||"[]");
 
-  const d=new Date();
-  const data={
+/* ===============================
+   GUARDAR + GOOGLE SHEETS
+================================ */
+function guardar(){
+  const f=new Date();
+  const r={
+    fecha:f.toISOString().split("T")[0],
+    hora:f.toLocaleTimeString("es-GT"),
     nombre:nombre.value,
     cargo:cargo.value,
     grupo:grupo.value,
     tipo:tipo.value,
-    observacion:obs.value,
-    firma:canvas.toDataURL(),
+    obs:obs.value,
+    firma:c.toDataURL(),
     userAgent:navigator.userAgent
   };
 
-  db.push({
-    fecha:d.toISOString().slice(0,10),
-    hora:d.toLocaleTimeString(),
-    ...data
-  });
+  if(!r.nombre) return alert("Nombre obligatorio");
 
+  db.push(r);
   localStorage.setItem(KEY,JSON.stringify(db));
   render();
 
-  fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify(data),mode:"no-cors"});
-  alert("Registro guardado");
+  fetch("https://script.google.com/macros/s/AKfycbxxZNdpp_YF-ZoDygwRbmkAP-jsMBI3Cdsq64aozRjS6Lk0DCSvriBtRmRAoPicZ3hpNQ/exec",{
+    method:"POST",
+    body:JSON.stringify(r)
+  });
 }
 
-// RENDER
+/* ===============================
+   RENDER TABLA
+================================ */
 function render(){
-  tabla.innerHTML=db.map(r=>`
-  <tr>
-    <td>${r.fecha}</td>
-    <td>${r.hora}</td>
-    <td>${r.nombre}</td>
-    <td>${r.cargo}</td>
-    <td>${r.grupo}</td>
-    <td>${r.tipo}</td>
-  </tr>`).join("");
+  tabla.innerHTML=db.map(x=>`
+    <tr>
+      <td>${x.fecha}</td>
+      <td>${x.hora}</td>
+      <td>${x.nombre}</td>
+      <td>${x.cargo}</td>
+      <td>${x.grupo}</td>
+      <td>${x.tipo}</td>
+    </tr>`).join("");
 }
 render();
 
-// EXPORTAR
+/* ===============================
+   EXPORTACIONES
+================================ */
 function pdf(){
   const {jsPDF}=window.jspdf;
   const d=new jsPDF();
   d.text("CONTROL DE ASISTENCIA — PMT",105,15,{align:"center"});
-  db.forEach((r,i)=>{
-    d.text(`${i+1}. ${r.fecha} ${r.hora} — ${r.nombre} (${r.tipo})`,15,30+i*8);
+  db.forEach((x,i)=>{
+    d.text(`${i+1}. ${x.fecha} ${x.hora} — ${x.nombre} (${x.tipo})`,20,30+i*8);
   });
   d.save("CONTROL_ASISTENCIA_PMT.pdf");
 }
 
 function word(){
-  let txt="CONTROL DE ASISTENCIA — PMT\n\n";
-  db.forEach((r,i)=>{
-    txt+=`${i+1}. ${r.fecha} ${r.hora} — ${r.nombre} (${r.tipo})\n`;
+  let t="CONTROL DE ASISTENCIA — PMT\n\n";
+  db.forEach((x,i)=>{
+    t+=`${i+1}. ${x.fecha} ${x.hora} - ${x.nombre} (${x.tipo})\n`;
   });
-  const b=new Blob([txt],{type:"application/msword"});
+  const b=new Blob([t],{type:"application/msword"});
   const a=document.createElement("a");
   a.href=URL.createObjectURL(b);
   a.download="CONTROL_ASISTENCIA_PMT.doc";
@@ -288,10 +233,13 @@ function excel(){
 }
 
 function borrar(){
-  if(confirm("¿Borrar todo?")){
-    db=[];localStorage.removeItem(KEY);render();
+  if(confirm("¿BORRAR TODO?")){
+    db=[];
+    localStorage.removeItem(KEY);
+    render();
   }
 }
 </script>
+
 </body>
 </html>
