@@ -314,3 +314,123 @@ tr:nth-child(even) td {
     max-width: 280px;
   }
 }
+/* ===============================
+   FORMULARIO — DIGITACIÓN PMT
+================================ */
+
+.section {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(0,255,200,0.35);
+  background: rgba(0,0,0,0.35);
+  box-shadow: 0 0 18px rgba(0,255,255,0.25);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+label {
+  font-size: 11px;
+  color: #66ffe6;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* INPUTS / SELECT / TEXTAREA */
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 999px;
+  border: 1px solid #00ffc8;
+  background: #050513;
+  color: #00ffc8;
+  font-size: 14px;
+  outline: none;
+  box-shadow:
+    inset 0 0 10px rgba(0,255,255,0.15),
+    0 0 12px rgba(0,255,255,0.35);
+  transition: all 0.25s ease;
+}
+
+textarea {
+  border-radius: 14px;
+  resize: vertical;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #66ffe6;
+}
+
+/* EFECTO FOCO */
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #00ffea;
+  box-shadow:
+    0 0 14px rgba(0,255,255,0.9),
+    inset 0 0 12px rgba(0,255,255,0.35);
+  background: #06061a;
+}
+
+/* CANVAS FIRMA */
+canvas {
+  width: 100%;
+  height: 140px;
+  background: #fff;
+  border-radius: 14px;
+  border: 2px solid #00ffc8;
+  box-shadow: 0 0 16px rgba(0,255,255,0.6);
+  cursor: crosshair;
+}
+
+/* BOTONES */
+.actions button {
+  padding: 12px;
+  border-radius: 999px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  letter-spacing: .5px;
+  box-shadow: 0 0 14px rgba(0,0,0,0.8);
+}
+
+.btn-save { background: linear-gradient(90deg,#00eaff,#00ffc8); color:#001; }
+.btn-pdf  { background: linear-gradient(90deg,#ff00cc,#8f00ff); color:#fff; }
+.btn-word { background: #0d6efd; color:#fff; }
+.btn-excel{ background: #28a745; color:#fff; }
+.btn-del  { background: #ff0033; color:#fff; }
+
+.actions button:hover {
+  filter: brightness(1.15);
+}
+
+/* TABLA */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 18px;
+  font-size: 13px;
+}
+
+th {
+  background: #00ffc8;
+  color: #001;
+  padding: 8px;
+}
+
+td {
+  padding: 8px;
+  border-bottom: 1px solid rgba(0,255,255,0.2);
+  color: #e9ffff;
+}
+
+tr:nth-child(even) td {
+  background: rgba(255,255,255,0.03);
+}
