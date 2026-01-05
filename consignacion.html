@@ -2,15 +2,12 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Consignación de Vehículo — GELM 2026</title>
+<title>Consignación de Vehículo – PMT | GELM 2026</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- LIBRERÍAS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#00ffc8">
 
 <style>
 body{
@@ -21,23 +18,21 @@ body{
   padding:20px;
 }
 .panel{
-  max-width:1000px;
+  max-width:1100px;
   margin:auto;
   background:#020510;
   padding:25px;
   border-radius:22px;
-  box-shadow:0 0 30px #00ffc8;
+  box-shadow:0 0 35px #00ffc8;
 }
-h1{text-align:center;color:#00ffc8;}
+h1{text-align:center;color:#00ffc8;margin-bottom:5px;}
 h3{color:#00ffc8;margin:22px 0 10px;}
 label{font-size:.7rem;color:#9cb3d8;text-transform:uppercase;}
-
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
   gap:10px;
 }
-
 input,select,textarea{
   width:100%;
   padding:10px;
@@ -46,8 +41,7 @@ input,select,textarea{
   background:#000;
   color:#fff;
 }
-
-textarea{min-height:80px}
+textarea{min-height:90px}
 
 /* FIRMA */
 canvas{
@@ -59,13 +53,13 @@ canvas{
   touch-action:none;
 }
 
+/* BOTONES */
 .actions{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
   gap:10px;
-  margin-top:15px;
+  margin-top:18px;
 }
-
 button{
   padding:12px;
   border-radius:999px;
@@ -82,7 +76,7 @@ button{
 table{
   width:100%;
   border-collapse:collapse;
-  margin-top:20px;
+  margin-top:22px;
   font-size:.75rem;
 }
 th{background:#00ffc8;color:#000;padding:6px;}
@@ -95,14 +89,16 @@ footer{text-align:center;font-size:10px;opacity:.6;margin-top:18px;}
 <body>
 <div class="panel">
 <h1>CONSIGNACIÓN DE VEHÍCULO — PMT</h1>
+<p style="text-align:center;font-size:.75rem;opacity:.8">Sistema GELM 2026</p>
 
 <!-- FECHA / HORA -->
 <div class="grid">
   <div><label>Fecha</label><input type="date" id="fecha"></div>
   <div><label>Hora</label><input type="time" id="hora"></div>
+  <div><label>Dirigido a</label><input id="dirigido" value="Juez de Asuntos Municipales y de Tránsito"></div>
 </div>
 
-<h3>Datos del Vehículo</h3>
+<h3>Características Generales del Vehículo</h3>
 <div class="grid">
   <input id="placas" placeholder="Placas">
   <input id="marca" placeholder="Marca">
@@ -113,34 +109,50 @@ footer{text-align:center;font-size:10px;opacity:.6;margin-top:18px;}
   <input id="motor" placeholder="Motor">
 </div>
 
-<h3>Datos de Consignación</h3>
+<h3>Accesorios (marcar y detallar estado)</h3>
+<div class="grid">
+  <input id="llantas" placeholder="Llantas">
+  <input id="radio" placeholder="Radio">
+  <input id="antena" placeholder="Antena">
+  <input id="retrovisores" placeholder="Retrovisores">
+  <input id="vidrios" placeholder="Vidrios">
+  <input id="herramienta" placeholder="Herramienta">
+</div>
+
+<h3>Documentos Consignados</h3>
+<div class="grid">
+  <input id="licencia" placeholder="Licencia">
+  <input id="tarjeta" placeholder="Tarjeta circulación">
+  <input id="permiso" placeholder="Permiso provisional">
+  <input id="llaves" placeholder="Llaves">
+</div>
+
+<h3>Datos Generales de Consignación</h3>
 <div class="grid">
   <input id="lugar" placeholder="Lugar">
   <input id="motivo" placeholder="Motivo">
   <input id="consignado" placeholder="Consignado por">
   <input id="delegacion" placeholder="Delegación">
   <input id="boleta" placeholder="Boleta">
-  <select id="grua">
-    <option value="NO">Grúa: NO</option>
-    <option value="SI">Grúa: SI</option>
-  </select>
+  <input id="grua" placeholder="Traslado grúa">
 </div>
 
-<h3>Conductor</h3>
+<h3>Datos del Conductor</h3>
 <div class="grid">
   <input id="conductor" placeholder="Nombre del conductor">
   <input id="tipoLic" placeholder="Tipo licencia">
-  <input id="doc" placeholder="Documento">
-  <input id="lic" placeholder="No. Licencia">
+  <input id="doc" placeholder="No. documento">
+  <input id="noLic" placeholder="No. licencia">
 </div>
 
-<label>Daños visibles</label>
+<h3>Daños visibles del vehículo</h3>
 <textarea id="danos"></textarea>
 
 <h3>Firmas</h3>
 <div class="grid">
-  <canvas id="sig1"></canvas>
-  <canvas id="sig2"></canvas>
+  <canvas id="f1"></canvas>
+  <canvas id="f2"></canvas>
+  <canvas id="f3"></canvas>
 </div>
 
 <div class="actions">
@@ -151,21 +163,10 @@ footer{text-align:center;font-size:10px;opacity:.6;margin-top:18px;}
   <button class="btn-del" onclick="borrar()">Borrar</button>
 </div>
 
-<h3>Exportar por mes</h3>
-<div class="grid">
-  <input type="month" id="mesFiltro">
-</div>
-
-<div class="actions">
-  <button class="btn-pdf" onclick="pdfMes()">PDF Mes</button>
-  <button class="btn-word" onclick="wordMes()">Word Mes</button>
-  <button class="btn-excel" onclick="excelMes()">Excel Mes</button>
-</div>
-
 <table>
 <thead>
 <tr>
-<th>Fecha</th><th>Placas</th><th>Conductor</th><th>Motivo</th>
+  <th>Fecha</th><th>Hora</th><th>Placas</th><th>Marca</th><th>Conductor</th>
 </tr>
 </thead>
 <tbody id="tabla"></tbody>
@@ -175,140 +176,86 @@ footer{text-align:center;font-size:10px;opacity:.6;margin-top:18px;}
 </div>
 
 <script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js");
-}
-
-const KEY="CONSIGNACIONES_GELM";
+const KEY="consignacion_gelm_2026";
 let db=JSON.parse(localStorage.getItem(KEY)||"[]");
 
-/* FIRMAS */
+/* FIRMA */
 function firma(id){
-  const c=document.getElementById(id);
-  const ctx=c.getContext("2d");
-  function resize(){
-    const r=c.getBoundingClientRect();
-    c.width=r.width; c.height=r.height;
-    ctx.lineWidth=2; ctx.lineCap="round";
-  }
-  resize(); window.addEventListener("resize",resize);
-  let d=false;
-  c.addEventListener("pointerdown",e=>{d=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);});
-  c.addEventListener("pointermove",e=>{if(d){ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();}});
-  c.addEventListener("pointerup",()=>d=false);
+ const c=document.getElementById(id),ctx=c.getContext("2d");
+ const r=()=>{c.width=c.offsetWidth;c.height=c.offsetHeight;ctx.lineWidth=2;};
+ r(); window.addEventListener("resize",r);
+ let d=false;
+ c.onpointerdown=e=>{d=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);}
+ c.onpointermove=e=>{if(d){ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();}}
+ window.onpointerup=()=>d=false;
 }
-firma("sig1"); firma("sig2");
+["f1","f2","f3"].forEach(firma);
 
+/* GUARDAR */
 function guardar(){
-  const r={
-    fecha:fecha.value,
-    hora:hora.value,
-    placas:placas.value,
-    marca:marca.value,
-    tipo:tipo.value,
-    color:color.value,
-    nit:nit.value,
-    chasis:chasis.value,
-    motor:motor.value,
-    lugar:lugar.value,
-    motivo:motivo.value,
-    consignado:consignado.value,
-    delegacion:delegacion.value,
-    boleta:boleta.value,
-    grua:grua.value,
-    conductor:conductor.value,
-    tipoLic:tipoLic.value,
-    doc:doc.value,
-    lic:lic.value,
-    danos:danos.value,
-    f1:sig1.toDataURL(),
-    f2:sig2.toDataURL()
-  };
-  if(!r.fecha||!r.placas) return alert("Faltan datos");
-  db.push(r);
-  localStorage.setItem(KEY,JSON.stringify(db));
-  render();
+ const r={
+  fecha:fecha.value,hora:hora.value,
+  placas:placas.value,marca:marca.value,
+  tipo:tipo.value,color:color.value,
+  conductor:conductor.value,
+  f1:f1.toDataURL(),f2:f2.toDataURL(),f3:f3.toDataURL()
+ };
+ if(!r.placas) return alert("Placas obligatorias");
+ db.push(r);
+ localStorage.setItem(KEY,JSON.stringify(db));
+ render();
 }
 
+/* TABLA */
 function render(){
-  tabla.innerHTML=db.map(x=>`
-    <tr><td>${x.fecha}</td><td>${x.placas}</td><td>${x.conductor}</td><td>${x.motivo}</td></tr>
-  `).join("");
+ tabla.innerHTML=db.map(x=>`
+  <tr>
+   <td>${x.fecha}</td>
+   <td>${x.hora}</td>
+   <td>${x.placas}</td>
+   <td>${x.marca}</td>
+   <td>${x.conductor}</td>
+  </tr>`).join("");
 }
 render();
 
+/* PDF */
 function pdf(){
-  const {jsPDF}=window.jspdf;
-  const r=db.at(-1); if(!r) return;
-  const d=new jsPDF();
-  let y=20;
-  d.text("CONSIGNACIÓN PMT",105,y,{align:"center"}); y+=10;
-  Object.entries(r).forEach(([k,v])=>{
-    if(!k.startsWith("f")){ d.text(`${k}: ${v}`,20,y); y+=6;}
-  });
-  d.addImage(r.f1,"PNG",20,200,70,30);
-  d.addImage(r.f2,"PNG",120,200,70,30);
-  d.save("consignacion.pdf");
+ const r=db.at(-1); if(!r) return;
+ const {jsPDF}=window.jspdf;
+ const d=new jsPDF();
+ d.text("CONSIGNACIÓN DE VEHÍCULO – PMT",105,15,{align:"center"});
+ d.text(`Placas: ${r.placas}`,20,30);
+ d.addImage(r.f1,"PNG",20,200,50,25);
+ d.addImage(r.f2,"PNG",80,200,50,25);
+ d.addImage(r.f3,"PNG",140,200,50,25);
+ d.save("consignacion_pmt.pdf");
 }
 
+/* WORD */
 function word(){
-  const r=db.at(-1); if(!r) return;
-  let t="CONSIGNACIÓN PMT\n\n";
-  Object.entries(r).forEach(([k,v])=>{
-    if(!k.startsWith("f")) t+=`${k}: ${v}\n`;
-  });
-  const b=new Blob([t],{type:"application/msword"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(b);
-  a.download="consignacion.doc";
-  a.click();
+ const r=db.at(-1); if(!r) return;
+ const t=`CONSIGNACIÓN DE VEHÍCULO – PMT\n\nPlacas: ${r.placas}\nMarca: ${r.marca}\nConductor: ${r.conductor}`;
+ const b=new Blob([t],{type:"application/msword"});
+ const a=document.createElement("a");
+ a.href=URL.createObjectURL(b);
+ a.download="consignacion_pmt.doc";
+ a.click();
 }
 
+/* EXCEL */
 function excel(){
-  const ws=XLSX.utils.json_to_sheet(db);
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,"Consignaciones");
-  XLSX.writeFile(wb,"consignaciones.xlsx");
+ const ws=XLSX.utils.json_to_sheet(db);
+ const wb=XLSX.utils.book_new();
+ XLSX.utils.book_append_sheet(wb,ws,"Consignaciones");
+ XLSX.writeFile(wb,"consignaciones_pmt.xlsx");
 }
 
-function filtrarMes(){
-  const m=mesFiltro.value;
-  if(!m) return [];
-  return db.filter(x=>x.fecha.startsWith(m));
-}
-
-function pdfMes(){
-  const datos=filtrarMes(); if(!datos.length) return alert("Sin datos");
-  const {jsPDF}=window.jspdf;
-  const d=new jsPDF(); let y=20;
-  d.text("REPORTE MENSUAL",105,y,{align:"center"}); y+=10;
-  datos.forEach((r,i)=>{d.text(`${i+1}. ${r.fecha} ${r.placas}`,20,y); y+=6;});
-  d.save("mensual.pdf");
-}
-
-function wordMes(){
-  const datos=filtrarMes(); if(!datos.length) return;
-  let t="REPORTE MENSUAL\n\n";
-  datos.forEach(r=>t+=`${r.fecha} ${r.placas}\n`);
-  const b=new Blob([t],{type:"application/msword"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(b);
-  a.download="mensual.doc";
-  a.click();
-}
-
-function excelMes(){
-  const datos=filtrarMes(); if(!datos.length) return;
-  const ws=XLSX.utils.json_to_sheet(datos);
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,"Mes");
-  XLSX.writeFile(wb,"mensual.xlsx");
-}
-
+/* BORRAR */
 function borrar(){
-  if(confirm("¿Borrar todo?")){
-    db=[]; localStorage.removeItem(KEY); render();
-  }
+ if(confirm("¿Borrar todo?")){
+  db=[];localStorage.removeItem(KEY);render();
+ }
 }
 </script>
 </body>
