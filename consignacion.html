@@ -3,92 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Consignación de Vehículo — PMT</title>
 
-<style>
-body{
-  font-family: Arial, sans-serif;
-  background:#f4f4f4;
-  margin:0;
-  padding:20px;
-}
-.container{
-  background:#fff;
-  padding:20px;
-  max-width:900px;
-  margin:auto;
-  border:1px solid #000;
-}
-h2,h3{
-  text-align:center;
-  margin:5px 0;
-}
-.grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px;
-}
-.grid-3{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-}
-label{
-  font-size:12px;
-  font-weight:bold;
-}
-input,textarea{
-  width:100%;
-  padding:4px;
-  font-size:12px;
-}
-textarea{resize:none}
-.section{
-  border:1px solid #000;
-  padding:10px;
-  margin-top:10px;
-}
-table{
-  width:100%;
-  border-collapse:collapse;
-}
-td,th{
-  border:1px solid #000;
-  padding:4px;
-  font-size:12px;
-}
-canvas{
-  border:1px solid #000;
-  width:100%;
-  height:120px;
-}
-.actions{
-  text-align:center;
-  margin-top:15px;
-}
-button{
-  padding:8px 14px;
-  margin:5px;
-  cursor:pointer;
-}
-small{font-size:10px}
-</style>
+<link rel="stylesheet" href="styles.css">
 
-<!-- LIBRERÍAS -->
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
 </head>
+
 <body>
 
-<div class="container">
+<div class="contenedor">
 
-<h2>POLICÍA MUNICIPAL DE TRÁNSITO</h2>
-<h3>Municipalidad de Chimaltenango</h3>
-<p style="text-align:center;font-size:12px">
-2a. Av. 1-53 zona 4, Chimaltenango
-</p>
+<!-- ENCABEZADO -->
+<div class="header-top">
+  <div class="logo-box">
+    <img src="icons/icon-192.png">
+  </div>
 
+  <div class="titulos">
+    <div class="titulos-linea1">CONSIGNACIÓN DE VEHÍCULO — PMT</div>
+    <div class="titulos-linea3" id="fechaHora"></div>
+    <div class="titulos-linea4">Sistema GELM 2026</div>
+  </div>
+
+  <div class="logo-box">
+    <img src="icons/icon-512.png">
+  </div>
+</div>
+
+<div class="panel">
+
+<!-- DATOS GENERALES -->
 <div class="section grid">
   <div>
     <label>Fecha</label>
@@ -100,126 +50,135 @@ small{font-size:10px}
   </div>
 </div>
 
-<div class="section">
-<h3>Características generales del vehículo</h3>
-<div class="grid">
+<!-- VEHÍCULO -->
+<div class="section grid">
   <div><label>Placas</label><input id="placas"></div>
-  <div><label>Chasis</label><input id="chasis"></div>
   <div><label>Marca</label><input id="marca"></div>
-  <div><label>Motor</label><input id="motor"></div>
   <div><label>Tipo</label><input id="tipoVeh"></div>
   <div><label>Color</label><input id="color"></div>
   <div><label>NIT</label><input id="nit"></div>
-</div>
-</div>
-
-<div class="section">
-<h3>Accesorios</h3>
-<table>
-<tr>
-<td><input type="checkbox"> Llanta de repuesto</td>
-<td><input type="checkbox"> Radio</td>
-<td><input type="checkbox"> Retrovisores</td>
-</tr>
-<tr>
-<td><input type="checkbox"> Bocinas</td>
-<td><input type="checkbox"> Antena</td>
-<td><input type="checkbox"> Herramientas</td>
-</tr>
-<tr>
-<td><input type="checkbox"> Cinturones</td>
-<td><input type="checkbox"> Stop</td>
-<td><input type="checkbox"> Placa Vías</td>
-</tr>
-</table>
+  <div><label>Chasis</label><input id="chasis"></div>
+  <div><label>Motor</label><input id="motor"></div>
 </div>
 
+<!-- ACCESORIOS -->
 <div class="section">
-<h3>Documentos consignados</h3>
-<table>
-<tr><td><input type="checkbox"> Licencia de conducir</td></tr>
-<tr><td><input type="checkbox"> Tarjeta de circulación</td></tr>
-<tr><td><input type="checkbox"> Permiso de conducir provisional</td></tr>
-<tr><td><input type="checkbox"> Llaves del vehículo</td></tr>
-<tr><td>Observaciones<br><textarea rows="2"></textarea></td></tr>
-</table>
-</div>
-
-<div class="section">
-<h3>Datos generales de consignación</h3>
+<label>Accesorios</label>
 <div class="grid">
-  <div><label>Lugar</label><input></div>
-  <div><label>Motivo</label><input></div>
-  <div><label>Consignado por</label><input></div>
-  <div><label>Delegación</label><input></div>
-  <div><label>Boleta de infracción</label><input></div>
-  <div><label>Traslado de grúa</label><input></div>
-  <div><label>Hora</label><input></div>
-  <div><label>Fecha</label><input></div>
+  <label><input type="checkbox" class="acc"> Llanta</label>
+  <label><input type="checkbox" class="acc"> Retrovisores</label>
+  <label><input type="checkbox" class="acc"> Antena</label>
+  <label><input type="checkbox" class="acc"> Silbines</label>
+  <label><input type="checkbox" class="acc"> Stop</label>
+  <label><input type="checkbox" class="acc"> Herramienta</label>
+  <label><input type="checkbox" class="acc"> Radio</label>
+  <label><input type="checkbox" class="acc"> Bocinas</label>
+  <label><input type="checkbox" class="acc"> Vidrios</label>
+  <label><input type="checkbox" class="acc"> Plumillas</label>
+  <label><input type="checkbox" class="acc"> Alfombras</label>
+  <label><input type="checkbox" class="acc"> Placa vías</label>
 </div>
 </div>
 
+<!-- DOCUMENTOS -->
 <div class="section">
-<h3>Datos del conductor</h3>
+<label>Documentos consignados</label>
 <div class="grid">
-  <div><label>Nombre completo</label><input></div>
-  <div><label>Tipo de licencia</label><input></div>
-  <div><label>No. Documento</label><input></div>
-  <div><label>No. Licencia</label><input></div>
+  <label><input type="checkbox" class="doc"> Licencia de conducir</label>
+  <label><input type="checkbox" class="doc"> Tarjeta de circulación</label>
+  <label><input type="checkbox" class="doc"> Permiso provisional</label>
+  <label><input type="checkbox" class="doc"> Llaves del vehículo</label>
 </div>
+<textarea id="obsDocs" rows="2" placeholder="Observaciones"></textarea>
+</div>
+
+<!-- DATOS CONSIGNACIÓN -->
+<div class="section grid">
+  <div><label>Lugar</label><input id="lugar"></div>
+  <div><label>Motivo</label><input id="motivo"></div>
+  <div><label>Consignado por</label><input id="consignado"></div>
+  <div><label>Delegación</label><input id="delegacion"></div>
+  <div><label>Boleta de infracción</label><input id="boleta"></div>
+  <div><label>Traslado grúa</label><input id="grua"></div>
+</div>
+
+<!-- CONDUCTOR -->
+<div class="section grid">
+  <div><label>Nombre del conductor</label><input id="conductor"></div>
+  <div><label>Tipo licencia</label><input id="tipoLic"></div>
+  <div><label>No. documento</label><input id="docu"></div>
+  <div><label>No. licencia</label><input id="lic"></div>
 </div>
 
 <div class="section">
-<h3>Daños visibles del vehículo</h3>
-<textarea rows="3"></textarea>
+<label>Daños visibles del vehículo</label>
+<textarea id="danos" rows="3"></textarea>
 </div>
 
-<div class="section grid-3">
-<div>
-<label>Firma quien consigna</label>
-<canvas></canvas>
+<!-- FIRMAS -->
+<div class="section grid">
+  <div>
+    <label>Firma quien consigna</label>
+    <canvas class="firma"></canvas>
+  </div>
+  <div>
+    <label>Firma del conductor</label>
+    <canvas class="firma"></canvas>
+  </div>
+  <div>
+    <label>Firma guardián de turno</label>
+    <canvas class="firma"></canvas>
+  </div>
 </div>
-<div>
-<label>Firma del conductor</label>
-<canvas></canvas>
-</div>
-<div>
-<label>Firma del guardián de turno</label>
-<canvas></canvas>
-</div>
-</div>
-
-<p><small>
-Cláusula de responsabilidad técnica GELM 2026 – Uso exclusivo PMT.
-</small></p>
 
 <div class="actions">
-<button onclick="exportPDF()">PDF</button>
-<button onclick="exportWord()">Word</button>
-<button onclick="exportExcel()">Excel</button>
+  <button class="btn-pdf" onclick="pdf()">PDF</button>
+  <button class="btn-word" onclick="word()">Word</button>
+  <button class="btn-excel" onclick="excel()">Excel</button>
 </div>
 
+<div class="pie">
+© 2026 — Sistema GELM — Propiedad intelectual reservada
+</div>
+
+</div>
 </div>
 
 <script>
-const { jsPDF } = window.jspdf;
-
-function exportPDF(){
-  const pdf = new jsPDF();
-  pdf.text("CONSIGNACIÓN DE VEHÍCULO – PMT",105,15,{align:"center"});
-  pdf.text("Documento generado electrónicamente",20,30);
-  pdf.save("consignacion_pmt.pdf");
+/* FECHA */
+function actualizarHora(){
+  const f=new Date();
+  fechaHora.innerText=f.toLocaleString("es-GT");
 }
+setInterval(actualizarHora,1000);
+actualizarHora();
 
-function exportWord(){
-  const blob=new Blob([document.body.innerText],{type:"application/msword"});
+/* FIRMAS */
+document.querySelectorAll(".firma").forEach(c=>{
+  const ctx=c.getContext("2d");
+  let d=false;
+  c.width=c.offsetWidth;
+  c.height=120;
+  c.onmousedown=e=>{d=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);}
+  c.onmousemove=e=>{if(d){ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();}}
+  window.onmouseup=()=>d=false;
+});
+
+/* EXPORT */
+function pdf(){
+  const {jsPDF}=window.jspdf;
+  const p=new jsPDF();
+  p.text("CONSIGNACIÓN DE VEHÍCULO — PMT",105,15,{align:"center"});
+  p.save("consignacion_pmt.pdf");
+}
+function word(){
+  const b=new Blob([document.body.innerText],{type:"application/msword"});
   const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
+  a.href=URL.createObjectURL(b);
   a.download="consignacion_pmt.doc";
   a.click();
 }
-
-function exportExcel(){
+function excel(){
   const wb=XLSX.utils.book_new();
   const ws=XLSX.utils.aoa_to_sheet([["Consignación PMT"]]);
   XLSX.utils.book_append_sheet(wb,ws,"Formulario");
