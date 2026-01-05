@@ -2,78 +2,130 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<title>Consignación de Vehículo — PMT | GELM 2026</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Consignación de Vehículo — PMT</title>
-
-<link rel="stylesheet" href="styles.css">
-<link rel="icon" href="icons/icon-192.png">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<style>
+body{
+  background:#050109;color:#e9f9ff;font-family:Segoe UI,system-ui;
+  margin:0;padding:20px;
+}
+.panel{
+  max-width:1050px;margin:auto;background:#020510;
+  padding:25px;border-radius:22px;
+  box-shadow:0 0 30px #00ffc8;
+}
+h1{text-align:center;color:#00ffc8;}
+h3{color:#00ffc8;margin:22px 0 10px;}
+h4{color:#9cb3d8;margin:15px 0 8px;font-size:.8rem;}
+label{font-size:.7rem;color:#9cb3d8;text-transform:uppercase;}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:10px;
+}
+
+input,select,textarea{
+  width:100%;padding:10px;border-radius:10px;
+  border:1px solid #00ffc8;background:#000;color:#fff;
+}
+textarea{min-height:80px}
+
+canvas{
+  width:100%;height:160px;background:#fff;
+  border-radius:12px;border:2px dashed #00ffc8;
+  touch-action:none;
+}
+
+.actions{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:10px;margin-top:18px;
+}
+button{
+  padding:12px;border-radius:999px;border:none;
+  font-weight:bold;cursor:pointer;
+}
+.btn-save{background:#00ffc8;}
+.btn-pdf{background:#b000ff;color:#fff;}
+.btn-word{background:#007bff;color:#fff;}
+.btn-excel{background:#28a745;color:#fff;}
+.btn-del{background:#ff0033;color:#fff;}
+
+footer{text-align:center;font-size:10px;opacity:.6;margin-top:18px;}
+</style>
 </head>
 
 <body>
-<div class="contenedor">
-
-<div class="header-top">
-  <div class="logo-box"><img src="icons/icon-192.png"></div>
-  <div class="titulos">
-    <div class="titulos-linea1">CONSIGNACIÓN DE VEHÍCULO — PMT</div>
-    <div class="titulos-linea3" id="fechaHora"></div>
-    <div class="titulos-linea4">Sistema GELM 2026</div>
-  </div>
-  <div class="logo-box"><img src="icons/icon-512.png"></div>
-</div>
-
 <div class="panel">
+<h1>CONSIGNACIÓN DE VEHÍCULO — PMT</h1>
 
-<div class="section grid">
-  <div><label>Placas</label><input id="placas"></div>
-  <div><label>Marca</label><input id="marca"></div>
-  <div><label>Tipo</label><input id="tipoVeh"></div>
-  <div><label>Color</label><input id="color"></div>
-  <div><label>NIT</label><input id="nit"></div>
-  <div><label>Chasis</label><input id="chasis"></div>
+<!-- DATOS GENERALES -->
+<div class="grid">
+  <div><label>Fecha</label><input type="date" id="fecha"></div>
+  <div><label>Hora</label><input type="time" id="hora"></div>
+  <div>
+    <label>Dirigido a</label>
+    <input value="Juez de Asuntos Municipales y de Tránsito" disabled>
+  </div>
 </div>
 
-<div class="section">
-  <label>Motor</label>
-  <input id="motor">
+<h3>Características del Vehículo</h3>
+<div class="grid">
+  <input id="placas" placeholder="Placas">
+  <input id="marca" placeholder="Marca">
+  <input id="tipo" placeholder="Tipo">
+  <input id="color" placeholder="Color">
+  <input id="nit" placeholder="NIT">
+  <input id="chasis" placeholder="Chasis">
+</div>
+<input id="motor" placeholder="Motor">
+
+<h3>Accesorios (marcar y detallar estado)</h3>
+<div class="grid">
+  <input id="acc_llantas" placeholder="Llantas / estado">
+  <input id="acc_radio" placeholder="Radio / carátula">
+  <input id="acc_antena" placeholder="Antena / estado">
+  <input id="acc_retrovisores" placeholder="Retrovisores (cantidad / estado)">
 </div>
 
-<div class="section">
-  <label>Daños visibles del vehículo</label>
-  <textarea id="danos" rows="2"></textarea>
+<h3>Documentos Consignados</h3>
+<div class="grid">
+  <input id="doc_licencia" placeholder="Licencia">
+  <input id="doc_tarjeta" placeholder="Tarjeta circulación">
+  <input id="doc_permiso" placeholder="Permiso provisional">
+  <input id="doc_llaves" placeholder="Llaves vehículo">
+</div>
+<textarea id="doc_obs" placeholder="Observaciones documentos"></textarea>
+
+<h3>Datos de Consignación</h3>
+<div class="grid">
+  <input id="lugar" placeholder="Lugar">
+  <input id="motivo" placeholder="Motivo">
+  <input id="consignado" placeholder="Consignado por">
+  <input id="delegacion" placeholder="Delegación">
+  <input id="boleta" placeholder="Boleta infracción">
+  <input id="grua" placeholder="Traslado grúa (Sí / No)">
 </div>
 
-<div class="section grid">
-  <div><label>Lugar</label><input id="lugar"></div>
-  <div><label>Motivo</label><input id="motivo"></div>
-  <div><label>Consignado por</label><input id="consignado"></div>
-  <div><label>Delegación</label><input id="delegacion"></div>
+<h3>Datos del Conductor</h3>
+<div class="grid">
+  <input id="conductor" placeholder="Nombre conductor">
+  <input id="tipoLic" placeholder="Tipo licencia">
+  <input id="documento" placeholder="No. Documento">
+  <input id="licencia" placeholder="No. Licencia">
 </div>
 
-<div class="section grid">
-  <div><label>Nombre del conductor</label><input id="conductor"></div>
-  <div><label>Tipo Licencia</label><input id="tipoLic"></div>
-  <div><label>No. Documento</label><input id="doc"></div>
-  <div><label>No. Licencia</label><input id="lic"></div>
-</div>
+<h3>Daños visibles del vehículo</h3>
+<textarea id="danos"></textarea>
 
-<div class="section">
-  <label>Firma quien consigna</label>
+<h3>Firmas</h3>
+<div class="grid">
   <canvas id="f1"></canvas>
-</div>
-
-<div class="section">
-  <label>Firma del conductor</label>
   <canvas id="f2"></canvas>
-</div>
-
-<div class="section">
-  <label>Firma guardián de turno</label>
   <canvas id="f3"></canvas>
 </div>
 
@@ -85,88 +137,77 @@
   <button class="btn-del" onclick="borrar()">Borrar</button>
 </div>
 
-</div>
+<footer>© 2026 — Sistema GELM — PMT</footer>
 </div>
 
 <script>
-/* FECHA */
-function actualizarHora(){
- const f=new Date();
- fechaHora.innerText=f.toLocaleString("es-GT");
-}
-setInterval(actualizarHora,1000); actualizarHora();
-
-/* FIRMAS SEGURAS */
-function firma(canvas){
- const ctx=canvas.getContext("2d");
- canvas.width=canvas.offsetWidth;
- canvas.height=120;
- let dib=false;
- canvas.addEventListener("pointerdown",e=>{dib=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);});
- canvas.addEventListener("pointermove",e=>{if(dib){ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();}});
- canvas.addEventListener("pointerup",()=>dib=false);
- canvas.addEventListener("pointerleave",()=>dib=false);
-}
-firma(f1); firma(f2); firma(f3);
-
-/* BASE */
-const KEY="CONSIGNACION_PMT";
+const KEY="consignacion_pmt_gelm";
 let db=JSON.parse(localStorage.getItem(KEY)||"[]");
+
+/* FIRMA */
+function firma(id){
+ const c=document.getElementById(id),ctx=c.getContext("2d");
+ function resize(){
+  const r=c.getBoundingClientRect();
+  c.width=r.width;c.height=r.height;
+  ctx.lineWidth=2;ctx.lineCap="round";
+ }
+ resize();window.addEventListener("resize",resize);
+ let d=false;
+ c.addEventListener("pointerdown",e=>{d=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);});
+ c.addEventListener("pointermove",e=>{if(d){ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();}});
+ c.addEventListener("pointerup",()=>d=false);
+ c.addEventListener("pointerleave",()=>d=false);
+}
+["f1","f2","f3"].forEach(firma);
 
 /* GUARDAR */
 function guardar(){
  const r={
-  fecha:new Date().toLocaleString("es-GT"),
-  placas:placas.value,
-  marca:marca.value,
-  tipo:tipoVeh.value,
-  color:color.value,
-  nit:nit.value,
-  chasis:chasis.value,
-  motor:motor.value,
+  fecha:fecha.value,hora:hora.value,
+  placas:placas.value,marca:marca.value,tipo:tipo.value,color:color.value,
+  nit:nit.value,chasis:chasis.value,motor:motor.value,
+  accesorios:{
+    llantas:acc_llantas.value,radio:acc_radio.value,
+    antena:acc_antena.value,retrovisores:acc_retrovisores.value
+  },
+  documentos:{
+    licencia:doc_licencia.value,tarjeta:doc_tarjeta.value,
+    permiso:doc_permiso.value,llaves:doc_llaves.value,obs:doc_obs.value
+  },
+  lugar:lugar.value,motivo:motivo.value,
+  consignado:consignado.value,delegacion:delegacion.value,
+  boleta:boleta.value,grua:grua.value,
+  conductor:{nombre:conductor.value,tipoLic:tipoLic.value,doc:documento.value,lic:licencia.value},
   danos:danos.value,
-  lugar:lugar.value,
-  motivo:motivo.value,
-  consignado:consignado.value,
-  delegacion:delegacion.value,
-  conductor:conductor.value,
-  tipoLic:tipoLic.value,
-  doc:doc.value,
-  lic:lic.value,
-  f1:f1.toDataURL(),
-  f2:f2.toDataURL(),
-  f3:f3.toDataURL()
+  f1:f1.toDataURL(),f2:f2.toDataURL(),f3:f3.toDataURL()
  };
  db.push(r);
  localStorage.setItem(KEY,JSON.stringify(db));
- alert("Guardado correctamente");
+ alert("Consignación guardada");
 }
 
 /* PDF */
 function pdf(){
+ const r=db.at(-1); if(!r) return;
  const {jsPDF}=window.jspdf;
- const d=new jsPDF();
+ const d=new jsPDF({format:"letter"});
  let y=20;
- d.text("CONSIGNACIÓN DE VEHÍCULO – PMT",105,10,{align:"center"});
- Object.entries(db[db.length-1]).forEach(([k,v])=>{
-  if(!k.startsWith("f")){
-   d.text(`${k.toUpperCase()}: ${v}`,10,y); y+=7;
-  }
+ d.text("CONSIGNACIÓN DE VEHÍCULO — PMT",105,10,{align:"center"});
+ Object.entries(r).forEach(([k,v])=>{
+  if(typeof v==="string"){ d.text(`${k.toUpperCase()}: ${v}`,20,y); y+=6;}
  });
  d.save("consignacion_pmt.pdf");
 }
 
 /* WORD */
 function word(){
- let t="CONSIGNACIÓN DE VEHÍCULO – PMT\n\n";
- Object.entries(db[db.length-1]).forEach(([k,v])=>{
-  if(!k.startsWith("f")) t+=`${k.toUpperCase()}: ${v}\n`;
- });
+ const r=db.at(-1); if(!r) return;
+ let t="CONSIGNACIÓN DE VEHÍCULO — PMT\n\n";
+ t+=JSON.stringify(r,null,2);
  const b=new Blob([t],{type:"application/msword"});
  const a=document.createElement("a");
- a.href=URL.createObjectURL(b);
- a.download="consignacion_pmt.doc";
- a.click();
+ a.href=URL.createObjectURL(b);a.download="consignacion_pmt.doc";a.click();
 }
 
 /* EXCEL */
@@ -180,7 +221,7 @@ function excel(){
 /* BORRAR */
 function borrar(){
  if(confirm("¿Borrar todo?")){
-  db=[]; localStorage.removeItem(KEY);
+  db=[];localStorage.removeItem(KEY);
  }
 }
 </script>
