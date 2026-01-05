@@ -16,37 +16,34 @@
 </head>
 
 <body>
-
 <div class="contenedor">
 
 <!-- ENCABEZADO -->
 <div class="header-top">
-  <div class="logo-box">
-    <img src="icons/icon-192.png">
-  </div>
-
+  <div class="logo-box"><img src="icons/icon-192.png"></div>
   <div class="titulos">
     <div class="titulos-linea1">CONSIGNACIÓN DE VEHÍCULO — PMT</div>
     <div class="titulos-linea3" id="fechaHora"></div>
     <div class="titulos-linea4">Sistema GELM 2026</div>
   </div>
-
-  <div class="logo-box">
-    <img src="icons/icon-512.png">
-  </div>
+  <div class="logo-box"><img src="icons/icon-512.png"></div>
 </div>
 
 <div class="panel">
 
-<!-- DATOS GENERALES -->
+<!-- FECHA / HORA / JUEZ -->
 <div class="section grid">
   <div>
     <label>Fecha</label>
-    <input id="fecha">
+    <input id="fecha" style="max-width:130px">
   </div>
   <div>
-    <label>Juez de asuntos municipales y de tránsito</label>
-    <input id="juez">
+    <label>Hora</label>
+    <input id="hora" style="max-width:120px">
+  </div>
+  <div>
+    <label>Dirigido a</label>
+    <input value="Juez de Asuntos Municipales y de Tránsito" disabled>
   </div>
 </div>
 
@@ -63,20 +60,12 @@
 
 <!-- ACCESORIOS -->
 <div class="section">
-<label>Accesorios</label>
+<label>Accesorios (marcar y detallar estado)</label>
 <div class="grid">
-  <label><input type="checkbox" class="acc"> Llanta</label>
-  <label><input type="checkbox" class="acc"> Retrovisores</label>
-  <label><input type="checkbox" class="acc"> Antena</label>
-  <label><input type="checkbox" class="acc"> Silbines</label>
-  <label><input type="checkbox" class="acc"> Stop</label>
-  <label><input type="checkbox" class="acc"> Herramienta</label>
-  <label><input type="checkbox" class="acc"> Radio</label>
-  <label><input type="checkbox" class="acc"> Bocinas</label>
-  <label><input type="checkbox" class="acc"> Vidrios</label>
-  <label><input type="checkbox" class="acc"> Plumillas</label>
-  <label><input type="checkbox" class="acc"> Alfombras</label>
-  <label><input type="checkbox" class="acc"> Placa vías</label>
+  <label><input type="checkbox" id="llanta"> Llanta</label><input id="obs_llanta" placeholder="Obs.">
+  <label><input type="checkbox" id="radio"> Radio</label><input id="obs_radio" placeholder="Ej: sin carátula">
+  <label><input type="checkbox" id="antena"> Antena</label><input id="obs_antena" placeholder="Ej: quebrada">
+  <label><input type="checkbox" id="retro"> Retrovisores</label><input id="obs_retro" placeholder="Ej: incompletos (3)">
 </div>
 </div>
 
@@ -84,21 +73,21 @@
 <div class="section">
 <label>Documentos consignados</label>
 <div class="grid">
-  <label><input type="checkbox" class="doc"> Licencia de conducir</label>
-  <label><input type="checkbox" class="doc"> Tarjeta de circulación</label>
-  <label><input type="checkbox" class="doc"> Permiso provisional</label>
-  <label><input type="checkbox" class="doc"> Llaves del vehículo</label>
+  <label><input type="checkbox" id="licencia"> Licencia</label>
+  <label><input type="checkbox" id="tarjeta"> Tarjeta circulación</label>
+  <label><input type="checkbox" id="permiso"> Permiso provisional</label>
+  <label><input type="checkbox" id="llaves"> Llaves</label>
 </div>
-<textarea id="obsDocs" rows="2" placeholder="Observaciones"></textarea>
+<textarea id="obsDocs" rows="1" placeholder="Observaciones documentos"></textarea>
 </div>
 
-<!-- DATOS CONSIGNACIÓN -->
+<!-- CONSIGNACIÓN -->
 <div class="section grid">
   <div><label>Lugar</label><input id="lugar"></div>
   <div><label>Motivo</label><input id="motivo"></div>
   <div><label>Consignado por</label><input id="consignado"></div>
   <div><label>Delegación</label><input id="delegacion"></div>
-  <div><label>Boleta de infracción</label><input id="boleta"></div>
+  <div><label>Boleta</label><input id="boleta"></div>
   <div><label>Traslado grúa</label><input id="grua"></div>
 </div>
 
@@ -117,60 +106,55 @@
 
 <!-- FIRMAS -->
 <div class="section grid">
-  <div>
-    <label>Firma quien consigna</label>
-    <canvas class="firma"></canvas>
-  </div>
-  <div>
-    <label>Firma del conductor</label>
-    <canvas class="firma"></canvas>
-  </div>
-  <div>
-    <label>Firma guardián de turno</label>
-    <canvas class="firma"></canvas>
-  </div>
+  <div><label>Firma quien consigna</label><canvas class="firma"></canvas></div>
+  <div><label>Firma del conductor</label><canvas class="firma"></canvas></div>
+  <div><label>Firma guardián de turno</label><canvas class="firma"></canvas></div>
 </div>
 
+<!-- ACCIONES -->
 <div class="actions">
+  <button class="btn-save" onclick="guardar()">Guardar</button>
   <button class="btn-pdf" onclick="pdf()">PDF</button>
   <button class="btn-word" onclick="word()">Word</button>
   <button class="btn-excel" onclick="excel()">Excel</button>
 </div>
 
-<div class="pie">
-© 2026 — Sistema GELM — Propiedad intelectual reservada
-</div>
+<div class="pie">© 2026 — Sistema GELM — Propiedad intelectual reservada</div>
 
 </div>
 </div>
 
 <script>
-/* FECHA */
-function actualizarHora(){
-  const f=new Date();
-  fechaHora.innerText=f.toLocaleString("es-GT");
+/* FECHA / HORA */
+const f=new Date();
+fecha.value=f.toLocaleDateString("es-GT");
+hora.value=f.toLocaleTimeString("es-GT");
+fechaHora.innerText=f.toLocaleString("es-GT");
+
+/* GUARDAR */
+const KEY="CONSIGNACION_PMT_GELM";
+function guardar(){
+  const data={placas:placas.value,marca:marca.value,tipo:tipoVeh.value,color:color.value,
+  nit:nit.value,chasis:chasis.value,motor:motor.value,lugar:lugar.value,motivo:motivo.value};
+  localStorage.setItem(KEY,JSON.stringify(data));
+  alert("Consignación guardada localmente");
 }
-setInterval(actualizarHora,1000);
-actualizarHora();
 
-/* FIRMAS */
-document.querySelectorAll(".firma").forEach(c=>{
-  const ctx=c.getContext("2d");
-  let d=false;
-  c.width=c.offsetWidth;
-  c.height=120;
-  c.onmousedown=e=>{d=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);}
-  c.onmousemove=e=>{if(d){ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();}}
-  window.onmouseup=()=>d=false;
-});
-
-/* EXPORT */
+/* PDF */
 function pdf(){
   const {jsPDF}=window.jspdf;
-  const p=new jsPDF();
-  p.text("CONSIGNACIÓN DE VEHÍCULO — PMT",105,15,{align:"center"});
-  p.save("consignacion_pmt.pdf");
+  const d=new jsPDF();
+  let y=20;
+  const l=(t,v)=>{d.text(`${t}: ${v||""}`,20,y);y+=7;}
+  d.text("CONSIGNACIÓN DE VEHÍCULO – PMT",105,12,{align:"center"});
+  l("Placas",placas.value);l("Marca",marca.value);l("Tipo",tipoVeh.value);
+  l("Color",color.value);l("NIT",nit.value);l("Chasis",chasis.value);
+  l("Motor",motor.value);l("Lugar",lugar.value);l("Motivo",motivo.value);
+  l("Conductor",conductor.value);l("Daños",danos.value);
+  d.save("consignacion_pmt.pdf");
 }
+
+/* WORD */
 function word(){
   const b=new Blob([document.body.innerText],{type:"application/msword"});
   const a=document.createElement("a");
@@ -178,12 +162,33 @@ function word(){
   a.download="consignacion_pmt.doc";
   a.click();
 }
+
+/* EXCEL */
 function excel(){
+  const data=[{Placas:placas.value,Marca:marca.value,Tipo:tipoVeh.value,
+  Color:color.value,NIT:nit.value,Chasis:chasis.value,Motor:motor.value,
+  Lugar:lugar.value,Motivo:motivo.value,Conductor:conductor.value,Daños:danos.value}];
+  const ws=XLSX.utils.json_to_sheet(data);
   const wb=XLSX.utils.book_new();
-  const ws=XLSX.utils.aoa_to_sheet([["Consignación PMT"]]);
-  XLSX.utils.book_append_sheet(wb,ws,"Formulario");
+  XLSX.utils.book_append_sheet(wb,ws,"Consignación");
   XLSX.writeFile(wb,"consignacion_pmt.xlsx");
 }
+
+/* FIRMAS LEGALES */
+document.querySelectorAll(".firma").forEach(c=>{
+  const ctx=c.getContext("2d");
+  let d=false;
+  c.width=c.offsetWidth;c.height=120;ctx.lineWidth=2;ctx.lineCap="round";
+  const pos=e=>{const r=c.getBoundingClientRect();
+    return {x:(e.touches?e.touches[0].clientX:e.clientX)-r.left,
+            y:(e.touches?e.touches[0].clientY:e.clientY)-r.top};};
+  c.onmousedown=e=>{d=true;const p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);}
+  c.onmousemove=e=>{if(!d)return;const p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke();}
+  window.onmouseup=()=>d=false;
+  c.ontouchstart=e=>{d=true;const p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);}
+  c.ontouchmove=e=>{if(!d)return;const p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke();}
+  c.ontouchend=()=>d=false;
+});
 </script>
 
 </body>
