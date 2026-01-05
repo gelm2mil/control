@@ -7,7 +7,6 @@
 <title>Consignación de Vehículo — PMT</title>
 
 <link rel="stylesheet" href="styles.css">
-
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 
@@ -18,7 +17,6 @@
 <body>
 <div class="contenedor">
 
-<!-- ENCABEZADO -->
 <div class="header-top">
   <div class="logo-box"><img src="icons/icon-192.png"></div>
   <div class="titulos">
@@ -31,23 +29,6 @@
 
 <div class="panel">
 
-<!-- FECHA / HORA / JUEZ -->
-<div class="section grid">
-  <div>
-    <label>Fecha</label>
-    <input id="fecha" style="max-width:130px">
-  </div>
-  <div>
-    <label>Hora</label>
-    <input id="hora" style="max-width:120px">
-  </div>
-  <div>
-    <label>Dirigido a</label>
-    <input value="Juez de Asuntos Municipales y de Tránsito" disabled>
-  </div>
-</div>
-
-<!-- VEHÍCULO -->
 <div class="section grid">
   <div><label>Placas</label><input id="placas"></div>
   <div><label>Marca</label><input id="marca"></div>
@@ -55,141 +36,153 @@
   <div><label>Color</label><input id="color"></div>
   <div><label>NIT</label><input id="nit"></div>
   <div><label>Chasis</label><input id="chasis"></div>
-  <div><label>Motor</label><input id="motor"></div>
 </div>
 
-<!-- ACCESORIOS -->
 <div class="section">
-<label>Accesorios (marcar y detallar estado)</label>
-<div class="grid">
-  <label><input type="checkbox" id="llanta"> Llanta</label><input id="obs_llanta" placeholder="Obs.">
-  <label><input type="checkbox" id="radio"> Radio</label><input id="obs_radio" placeholder="Ej: sin carátula">
-  <label><input type="checkbox" id="antena"> Antena</label><input id="obs_antena" placeholder="Ej: quebrada">
-  <label><input type="checkbox" id="retro"> Retrovisores</label><input id="obs_retro" placeholder="Ej: incompletos (3)">
-</div>
+  <label>Motor</label>
+  <input id="motor">
 </div>
 
-<!-- DOCUMENTOS -->
 <div class="section">
-<label>Documentos consignados</label>
-<div class="grid">
-  <label><input type="checkbox" id="licencia"> Licencia</label>
-  <label><input type="checkbox" id="tarjeta"> Tarjeta circulación</label>
-  <label><input type="checkbox" id="permiso"> Permiso provisional</label>
-  <label><input type="checkbox" id="llaves"> Llaves</label>
-</div>
-<textarea id="obsDocs" rows="1" placeholder="Observaciones documentos"></textarea>
+  <label>Daños visibles del vehículo</label>
+  <textarea id="danos" rows="2"></textarea>
 </div>
 
-<!-- CONSIGNACIÓN -->
 <div class="section grid">
   <div><label>Lugar</label><input id="lugar"></div>
   <div><label>Motivo</label><input id="motivo"></div>
   <div><label>Consignado por</label><input id="consignado"></div>
   <div><label>Delegación</label><input id="delegacion"></div>
-  <div><label>Boleta</label><input id="boleta"></div>
-  <div><label>Traslado grúa</label><input id="grua"></div>
 </div>
 
-<!-- CONDUCTOR -->
 <div class="section grid">
   <div><label>Nombre del conductor</label><input id="conductor"></div>
-  <div><label>Tipo licencia</label><input id="tipoLic"></div>
-  <div><label>No. documento</label><input id="docu"></div>
-  <div><label>No. licencia</label><input id="lic"></div>
+  <div><label>Tipo Licencia</label><input id="tipoLic"></div>
+  <div><label>No. Documento</label><input id="doc"></div>
+  <div><label>No. Licencia</label><input id="lic"></div>
 </div>
 
 <div class="section">
-<label>Daños visibles del vehículo</label>
-<textarea id="danos" rows="3"></textarea>
+  <label>Firma quien consigna</label>
+  <canvas id="f1"></canvas>
 </div>
 
-<!-- FIRMAS -->
-<div class="section grid">
-  <div><label>Firma quien consigna</label><canvas class="firma"></canvas></div>
-  <div><label>Firma del conductor</label><canvas class="firma"></canvas></div>
-  <div><label>Firma guardián de turno</label><canvas class="firma"></canvas></div>
+<div class="section">
+  <label>Firma del conductor</label>
+  <canvas id="f2"></canvas>
 </div>
 
-<!-- ACCIONES -->
+<div class="section">
+  <label>Firma guardián de turno</label>
+  <canvas id="f3"></canvas>
+</div>
+
 <div class="actions">
   <button class="btn-save" onclick="guardar()">Guardar</button>
   <button class="btn-pdf" onclick="pdf()">PDF</button>
   <button class="btn-word" onclick="word()">Word</button>
   <button class="btn-excel" onclick="excel()">Excel</button>
+  <button class="btn-del" onclick="borrar()">Borrar</button>
 </div>
-
-<div class="pie">© 2026 — Sistema GELM — Propiedad intelectual reservada</div>
 
 </div>
 </div>
 
 <script>
-/* FECHA / HORA */
-const f=new Date();
-fecha.value=f.toLocaleDateString("es-GT");
-hora.value=f.toLocaleTimeString("es-GT");
-fechaHora.innerText=f.toLocaleString("es-GT");
+/* FECHA */
+function actualizarHora(){
+ const f=new Date();
+ fechaHora.innerText=f.toLocaleString("es-GT");
+}
+setInterval(actualizarHora,1000); actualizarHora();
+
+/* FIRMAS SEGURAS */
+function firma(canvas){
+ const ctx=canvas.getContext("2d");
+ canvas.width=canvas.offsetWidth;
+ canvas.height=120;
+ let dib=false;
+ canvas.addEventListener("pointerdown",e=>{dib=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);});
+ canvas.addEventListener("pointermove",e=>{if(dib){ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();}});
+ canvas.addEventListener("pointerup",()=>dib=false);
+ canvas.addEventListener("pointerleave",()=>dib=false);
+}
+firma(f1); firma(f2); firma(f3);
+
+/* BASE */
+const KEY="CONSIGNACION_PMT";
+let db=JSON.parse(localStorage.getItem(KEY)||"[]");
 
 /* GUARDAR */
-const KEY="CONSIGNACION_PMT_GELM";
 function guardar(){
-  const data={placas:placas.value,marca:marca.value,tipo:tipoVeh.value,color:color.value,
-  nit:nit.value,chasis:chasis.value,motor:motor.value,lugar:lugar.value,motivo:motivo.value};
-  localStorage.setItem(KEY,JSON.stringify(data));
-  alert("Consignación guardada localmente");
+ const r={
+  fecha:new Date().toLocaleString("es-GT"),
+  placas:placas.value,
+  marca:marca.value,
+  tipo:tipoVeh.value,
+  color:color.value,
+  nit:nit.value,
+  chasis:chasis.value,
+  motor:motor.value,
+  danos:danos.value,
+  lugar:lugar.value,
+  motivo:motivo.value,
+  consignado:consignado.value,
+  delegacion:delegacion.value,
+  conductor:conductor.value,
+  tipoLic:tipoLic.value,
+  doc:doc.value,
+  lic:lic.value,
+  f1:f1.toDataURL(),
+  f2:f2.toDataURL(),
+  f3:f3.toDataURL()
+ };
+ db.push(r);
+ localStorage.setItem(KEY,JSON.stringify(db));
+ alert("Guardado correctamente");
 }
 
 /* PDF */
 function pdf(){
-  const {jsPDF}=window.jspdf;
-  const d=new jsPDF();
-  let y=20;
-  const l=(t,v)=>{d.text(`${t}: ${v||""}`,20,y);y+=7;}
-  d.text("CONSIGNACIÓN DE VEHÍCULO – PMT",105,12,{align:"center"});
-  l("Placas",placas.value);l("Marca",marca.value);l("Tipo",tipoVeh.value);
-  l("Color",color.value);l("NIT",nit.value);l("Chasis",chasis.value);
-  l("Motor",motor.value);l("Lugar",lugar.value);l("Motivo",motivo.value);
-  l("Conductor",conductor.value);l("Daños",danos.value);
-  d.save("consignacion_pmt.pdf");
+ const {jsPDF}=window.jspdf;
+ const d=new jsPDF();
+ let y=20;
+ d.text("CONSIGNACIÓN DE VEHÍCULO – PMT",105,10,{align:"center"});
+ Object.entries(db[db.length-1]).forEach(([k,v])=>{
+  if(!k.startsWith("f")){
+   d.text(`${k.toUpperCase()}: ${v}`,10,y); y+=7;
+  }
+ });
+ d.save("consignacion_pmt.pdf");
 }
 
 /* WORD */
 function word(){
-  const b=new Blob([document.body.innerText],{type:"application/msword"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(b);
-  a.download="consignacion_pmt.doc";
-  a.click();
+ let t="CONSIGNACIÓN DE VEHÍCULO – PMT\n\n";
+ Object.entries(db[db.length-1]).forEach(([k,v])=>{
+  if(!k.startsWith("f")) t+=`${k.toUpperCase()}: ${v}\n`;
+ });
+ const b=new Blob([t],{type:"application/msword"});
+ const a=document.createElement("a");
+ a.href=URL.createObjectURL(b);
+ a.download="consignacion_pmt.doc";
+ a.click();
 }
 
 /* EXCEL */
 function excel(){
-  const data=[{Placas:placas.value,Marca:marca.value,Tipo:tipoVeh.value,
-  Color:color.value,NIT:nit.value,Chasis:chasis.value,Motor:motor.value,
-  Lugar:lugar.value,Motivo:motivo.value,Conductor:conductor.value,Daños:danos.value}];
-  const ws=XLSX.utils.json_to_sheet(data);
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,"Consignación");
-  XLSX.writeFile(wb,"consignacion_pmt.xlsx");
+ const ws=XLSX.utils.json_to_sheet(db);
+ const wb=XLSX.utils.book_new();
+ XLSX.utils.book_append_sheet(wb,ws,"Consignaciones");
+ XLSX.writeFile(wb,"consignacion_pmt.xlsx");
 }
 
-/* FIRMAS LEGALES */
-document.querySelectorAll(".firma").forEach(c=>{
-  const ctx=c.getContext("2d");
-  let d=false;
-  c.width=c.offsetWidth;c.height=120;ctx.lineWidth=2;ctx.lineCap="round";
-  const pos=e=>{const r=c.getBoundingClientRect();
-    return {x:(e.touches?e.touches[0].clientX:e.clientX)-r.left,
-            y:(e.touches?e.touches[0].clientY:e.clientY)-r.top};};
-  c.onmousedown=e=>{d=true;const p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);}
-  c.onmousemove=e=>{if(!d)return;const p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke();}
-  window.onmouseup=()=>d=false;
-  c.ontouchstart=e=>{d=true;const p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);}
-  c.ontouchmove=e=>{if(!d)return;const p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke();}
-  c.ontouchend=()=>d=false;
-});
+/* BORRAR */
+function borrar(){
+ if(confirm("¿Borrar todo?")){
+  db=[]; localStorage.removeItem(KEY);
+ }
+}
 </script>
-
 </body>
 </html>
