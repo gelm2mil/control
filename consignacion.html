@@ -25,9 +25,15 @@ body{
   border-radius:22px;
   box-shadow:0 0 30px #00ffc8;
 }
-h1{text-align:center;color:#00ffc8;}
+h1{text-align:center;color:#00ffc8;margin-bottom:5px;}
+.sub{
+  text-align:center;
+  font-size:13px;
+  color:#9cb3d8;
+  margin-bottom:20px;
+}
+
 h3{color:#00ffc8;margin:22px 0 10px;}
-.sub{font-size:.8rem;text-align:center;color:#9cb3d8;margin-bottom:18px}
 label{font-size:.7rem;color:#9cb3d8;text-transform:uppercase;}
 
 .grid{
@@ -35,7 +41,8 @@ label{font-size:.7rem;color:#9cb3d8;text-transform:uppercase;}
   grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
   gap:10px;
 }
-.grid-fecha{
+
+.grid-2{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
@@ -62,7 +69,7 @@ canvas{
 
 .actions{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  grid-template-columns:1fr;
   gap:10px;
   margin-top:18px;
 }
@@ -88,7 +95,7 @@ table{
   font-size:.8rem;
 }
 th{background:#00ffc8;color:#000;padding:6px;}
-td{padding:6px;border-bottom:1px solid #333;}
+td{padding:6px;border-bottom:1px solid #333;text-align:center;}
 
 footer{text-align:center;font-size:10px;opacity:.6;margin-top:18px;}
 </style>
@@ -96,14 +103,19 @@ footer{text-align:center;font-size:10px;opacity:.6;margin-top:18px;}
 
 <body>
 <div class="panel">
-
 <h1>CONSIGNACIÓN DE VEHÍCULO — PMT</h1>
 <div class="sub">Dirigido a: Juzgado de Asuntos Municipales y de Tránsito</div>
 
 <!-- FECHA / HORA -->
-<div class="grid-fecha">
-  <div><label>Fecha</label><input type="date" id="fecha"></div>
-  <div><label>Hora</label><input type="time" id="hora"></div>
+<div class="grid-2">
+  <div>
+    <label>Fecha</label>
+    <input type="date" id="fecha">
+  </div>
+  <div>
+    <label>Hora</label>
+    <input type="time" id="hora">
+  </div>
 </div>
 
 <h3>Datos del Vehículo</h3>
@@ -151,14 +163,18 @@ footer{text-align:center;font-size:10px;opacity:.6;margin-top:18px;}
   <button class="btn-word" onclick="word()">Word</button>
   <button class="btn-excel" onclick="excel()">Excel</button>
   <button class="btn-month" onclick="excelMes()">Excel por mes</button>
-  <button class="btn-month" onclick="wordMes()">Word por mes</button>
   <button class="btn-del" onclick="borrar()">Borrar</button>
 </div>
 
 <table>
 <thead>
 <tr>
-  <th>#</th><th>Fecha</th><th>Hora</th><th>Placas</th><th>Marca</th><th>Motivo</th>
+  <th>#</th>
+  <th>Fecha</th>
+  <th>Hora</th>
+  <th>Placas</th>
+  <th>Marca</th>
+  <th>Motivo</th>
 </tr>
 </thead>
 <tbody id="tabla"></tbody>
@@ -198,15 +214,33 @@ function firma(id){
 
 /* ===== GUARDAR ===== */
 function guardar(){
-  if(!fecha.value||!placas.value){alert("Fecha y placas obligatorias");return;}
+  if(!fecha.value||!placas.value){
+    alert("Fecha y placas obligatorias");
+    return;
+  }
 
   const r={
-    fecha:fecha.value, hora:hora.value,
-    placas:placas.value, marca:marca.value, tipo:tipo.value, color:color.value,
-    nit:nit.value, chasis:chasis.value, motor:motor.value,
-    lugar:lugar.value, motivo:motivo.value, consignado:consignado.value,
-    delegacion:delegacion.value, boleta:boleta.value, grua:grua.value,
-    conductor:{nombre:conductor.value, tipo:lic_tipo.value, doc:doc.value, lic:lic.value},
+    fecha:fecha.value,
+    hora:hora.value,
+    placas:placas.value,
+    marca:marca.value,
+    tipo:tipo.value,
+    color:color.value,
+    nit:nit.value,
+    chasis:chasis.value,
+    motor:motor.value,
+    lugar:lugar.value,
+    motivo:motivo.value,
+    consignado:consignado.value,
+    delegacion:delegacion.value,
+    boleta:boleta.value,
+    grua:grua.value,
+    conductor:{
+      nombre:conductor.value,
+      tipo:lic_tipo.value,
+      doc:doc.value,
+      lic:lic.value
+    },
     danos:danos.value,
     firmas:[f1.toDataURL(),f2.toDataURL(),f3.toDataURL()]
   };
@@ -226,7 +260,8 @@ function render(){
       <td>${x.placas}</td>
       <td>${x.marca}</td>
       <td>${x.motivo}</td>
-    </tr>`).join("");
+    </tr>
+  `).join("");
 }
 render();
 
@@ -239,11 +274,15 @@ function pdf(){
 
   d.text("CONSIGNACIÓN DE VEHÍCULO — PMT",105,y,{align:"center"}); y+=10;
   d.setFontSize(10);
+
   Object.entries({
     Fecha:r.fecha, Hora:r.hora, Placas:r.placas, Marca:r.marca,
-    Tipo:r.tipo, Color:r.color, NIT:r.nit, Chasis:r.chasis, Motor:r.motor,
-    Lugar:r.lugar, Motivo:r.motivo, Conductor:r.conductor.nombre
-  }).forEach(([k,v])=>{ d.text(`${k}: ${v||""}`,20,y); y+=5; });
+    Tipo:r.tipo, Color:r.color, NIT:r.nit, Chasis:r.chasis,
+    Motor:r.motor, Lugar:r.lugar, Motivo:r.motivo,
+    Conductor:r.conductor.nombre
+  }).forEach(([k,v])=>{
+    d.text(`${k}: ${v||""}`,20,y); y+=5;
+  });
 
   d.text("Daños:",20,y); y+=5;
   d.text(r.danos||"",20,y,{maxWidth:170});
@@ -284,25 +323,6 @@ ${r.danos}`;
   a.click();
 }
 
-/* ===== WORD POR MES ===== */
-function wordMes(){
-  const m=prompt("Mes (YYYY-MM):");
-  if(!m) return;
-  const f=db.filter(x=>x.fecha.startsWith(m));
-  if(!f.length){alert("Sin registros");return;}
-
-  let t=`CONSIGNACIONES DE VEHÍCULO — PMT\nMES: ${m}\n\n`;
-  f.forEach((r,i)=>{
-    t+=`#${i+1}\nFecha: ${r.fecha}\nHora: ${r.hora}\nPlacas: ${r.placas}\nMarca: ${r.marca}\nMotivo: ${r.motivo}\n\n`;
-  });
-
-  const b=new Blob([t],{type:"application/msword"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(b);
-  a.download=`consignaciones_${m}.doc`;
-  a.click();
-}
-
 /* ===== EXCEL ===== */
 function excel(){
   const ws=XLSX.utils.json_to_sheet(db);
@@ -326,7 +346,9 @@ function excelMes(){
 /* ===== BORRAR ===== */
 function borrar(){
   if(confirm("¿Borrar todo?")){
-    db=[]; localStorage.removeItem(KEY); render();
+    db=[];
+    localStorage.removeItem(KEY);
+    render();
   }
 }
 </script>
