@@ -9,7 +9,11 @@
 <!-- CSS EXTERNO -->
 <link rel="stylesheet" href="styles.css">
 
-<!-- ICONOS PWA -->
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#00fff0">
+
+<!-- ICONOS -->
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 
@@ -238,6 +242,18 @@ function borrar(){
     localStorage.removeItem(KEY);
     render();
   }
+}
+</script>
+
+<!-- SERVICE WORKER -->
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("sw.js")
+      .then(() => console.log("✔ Service Worker GELM activo"))
+      .catch(err => console.error("❌ Error SW:", err));
+  });
 }
 </script>
 
