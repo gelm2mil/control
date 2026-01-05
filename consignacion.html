@@ -2,25 +2,31 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Consignación de Vehículo — PMT | GELM 2026</title>
+<title>Consignación de Vehículo — GELM 2026</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- LIBRERÍAS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <style>
 body{
-  background:#050109;color:#e9f9ff;font-family:Segoe UI,system-ui;
-  margin:0;padding:20px;
+  background:#050109;
+  color:#e9f9ff;
+  font-family:Segoe UI,system-ui;
+  margin:0;
+  padding:20px;
 }
 .panel{
-  max-width:1050px;margin:auto;background:#020510;
-  padding:25px;border-radius:22px;
+  max-width:1000px;
+  margin:auto;
+  background:#020510;
+  padding:25px;
+  border-radius:22px;
   box-shadow:0 0 30px #00ffc8;
 }
 h1{text-align:center;color:#00ffc8;}
 h3{color:#00ffc8;margin:22px 0 10px;}
-h4{color:#9cb3d8;margin:15px 0 8px;font-size:.8rem;}
 label{font-size:.7rem;color:#9cb3d8;text-transform:uppercase;}
 
 .grid{
@@ -29,31 +35,53 @@ label{font-size:.7rem;color:#9cb3d8;text-transform:uppercase;}
   gap:10px;
 }
 
-input,select,textarea{
-  width:100%;padding:10px;border-radius:10px;
-  border:1px solid #00ffc8;background:#000;color:#fff;
+input,textarea{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #00ffc8;
+  background:#000;
+  color:#fff;
 }
-textarea{min-height:80px}
+textarea{min-height:90px}
 
 canvas{
-  width:100%;height:160px;background:#fff;
-  border-radius:12px;border:2px dashed #00ffc8;
+  width:100%;
+  height:160px;
+  background:#fff;
+  border-radius:12px;
+  border:2px dashed #00ffc8;
   touch-action:none;
 }
 
 .actions{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-  gap:10px;margin-top:18px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:10px;
+  margin-top:18px;
 }
+
 button{
-  padding:12px;border-radius:999px;border:none;
-  font-weight:bold;cursor:pointer;
+  padding:12px;
+  border-radius:999px;
+  border:none;
+  font-weight:bold;
+  cursor:pointer;
 }
 .btn-save{background:#00ffc8;}
 .btn-pdf{background:#b000ff;color:#fff;}
 .btn-word{background:#007bff;color:#fff;}
 .btn-excel{background:#28a745;color:#fff;}
 .btn-del{background:#ff0033;color:#fff;}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:22px;
+  font-size:.8rem;
+}
+th{background:#00ffc8;color:#000;padding:6px;}
+td{padding:6px;border-bottom:1px solid #333;}
 
 footer{text-align:center;font-size:10px;opacity:.6;margin-top:18px;}
 </style>
@@ -67,13 +95,9 @@ footer{text-align:center;font-size:10px;opacity:.6;margin-top:18px;}
 <div class="grid">
   <div><label>Fecha</label><input type="date" id="fecha"></div>
   <div><label>Hora</label><input type="time" id="hora"></div>
-  <div>
-    <label>Dirigido a</label>
-    <input value="Juez de Asuntos Municipales y de Tránsito" disabled>
-  </div>
 </div>
 
-<h3>Características del Vehículo</h3>
+<h3>Datos del Vehículo</h3>
 <div class="grid">
   <input id="placas" placeholder="Placas">
   <input id="marca" placeholder="Marca">
@@ -81,25 +105,8 @@ footer{text-align:center;font-size:10px;opacity:.6;margin-top:18px;}
   <input id="color" placeholder="Color">
   <input id="nit" placeholder="NIT">
   <input id="chasis" placeholder="Chasis">
+  <input id="motor" placeholder="Motor">
 </div>
-<input id="motor" placeholder="Motor">
-
-<h3>Accesorios (marcar y detallar estado)</h3>
-<div class="grid">
-  <input id="acc_llantas" placeholder="Llantas / estado">
-  <input id="acc_radio" placeholder="Radio / carátula">
-  <input id="acc_antena" placeholder="Antena / estado">
-  <input id="acc_retrovisores" placeholder="Retrovisores (cantidad / estado)">
-</div>
-
-<h3>Documentos Consignados</h3>
-<div class="grid">
-  <input id="doc_licencia" placeholder="Licencia">
-  <input id="doc_tarjeta" placeholder="Tarjeta circulación">
-  <input id="doc_permiso" placeholder="Permiso provisional">
-  <input id="doc_llaves" placeholder="Llaves vehículo">
-</div>
-<textarea id="doc_obs" placeholder="Observaciones documentos"></textarea>
 
 <h3>Datos de Consignación</h3>
 <div class="grid">
@@ -107,26 +114,25 @@ footer{text-align:center;font-size:10px;opacity:.6;margin-top:18px;}
   <input id="motivo" placeholder="Motivo">
   <input id="consignado" placeholder="Consignado por">
   <input id="delegacion" placeholder="Delegación">
-  <input id="boleta" placeholder="Boleta infracción">
-  <input id="grua" placeholder="Traslado grúa (Sí / No)">
+  <input id="boleta" placeholder="Boleta">
+  <input id="grua" placeholder="Traslado grúa (SI / NO)">
 </div>
 
-<h3>Datos del Conductor</h3>
+<h3>Conductor</h3>
 <div class="grid">
-  <input id="conductor" placeholder="Nombre conductor">
-  <input id="tipoLic" placeholder="Tipo licencia">
-  <input id="documento" placeholder="No. Documento">
-  <input id="licencia" placeholder="No. Licencia">
+  <input id="conductor" placeholder="Nombre del conductor">
+  <input id="lic_tipo" placeholder="Tipo licencia">
+  <input id="doc" placeholder="Documento">
+  <input id="lic" placeholder="No. Licencia">
 </div>
 
-<h3>Daños visibles del vehículo</h3>
+<h3>Daños visibles</h3>
 <textarea id="danos"></textarea>
 
 <h3>Firmas</h3>
 <div class="grid">
-  <canvas id="f1"></canvas>
-  <canvas id="f2"></canvas>
-  <canvas id="f3"></canvas>
+  <canvas id="firma1"></canvas>
+  <canvas id="firma2"></canvas>
 </div>
 
 <div class="actions">
@@ -137,92 +143,152 @@ footer{text-align:center;font-size:10px;opacity:.6;margin-top:18px;}
   <button class="btn-del" onclick="borrar()">Borrar</button>
 </div>
 
+<table>
+<thead>
+<tr>
+  <th>Fecha</th><th>Hora</th><th>Placas</th><th>Conductor</th><th>Motivo</th>
+</tr>
+</thead>
+<tbody id="tabla"></tbody>
+</table>
+
 <footer>© 2026 — Sistema GELM — PMT</footer>
 </div>
 
 <script>
-const KEY="consignacion_pmt_gelm";
+const KEY="CONSIGNACION_PMT_GELM";
 let db=JSON.parse(localStorage.getItem(KEY)||"[]");
 
-/* FIRMA */
+/* ===== FIRMAS (MISMO SISTEMA QUE HECHOS) ===== */
 function firma(id){
- const c=document.getElementById(id),ctx=c.getContext("2d");
- function resize(){
-  const r=c.getBoundingClientRect();
-  c.width=r.width;c.height=r.height;
-  ctx.lineWidth=2;ctx.lineCap="round";
- }
- resize();window.addEventListener("resize",resize);
- let d=false;
- c.addEventListener("pointerdown",e=>{d=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);});
- c.addEventListener("pointermove",e=>{if(d){ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();}});
- c.addEventListener("pointerup",()=>d=false);
- c.addEventListener("pointerleave",()=>d=false);
-}
-["f1","f2","f3"].forEach(firma);
+  const c=document.getElementById(id);
+  const ctx=c.getContext("2d");
 
-/* GUARDAR */
+  function resize(){
+    const r=c.getBoundingClientRect();
+    c.width=r.width; c.height=r.height;
+    ctx.lineWidth=2; ctx.lineCap="round";
+  }
+  resize(); window.addEventListener("resize",resize);
+
+  let draw=false;
+  c.addEventListener("pointerdown",e=>{
+    e.preventDefault(); draw=true;
+    ctx.beginPath(); ctx.moveTo(e.offsetX,e.offsetY);
+  });
+  c.addEventListener("pointermove",e=>{
+    if(!draw) return;
+    ctx.lineTo(e.offsetX,e.offsetY); ctx.stroke();
+  });
+  c.addEventListener("pointerup",()=>draw=false);
+  c.addEventListener("pointerleave",()=>draw=false);
+}
+firma("firma1"); firma("firma2");
+
+/* ===== GUARDAR ===== */
 function guardar(){
- const r={
-  fecha:fecha.value,hora:hora.value,
-  placas:placas.value,marca:marca.value,tipo:tipo.value,color:color.value,
-  nit:nit.value,chasis:chasis.value,motor:motor.value,
-  accesorios:{
-    llantas:acc_llantas.value,radio:acc_radio.value,
-    antena:acc_antena.value,retrovisores:acc_retrovisores.value
-  },
-  documentos:{
-    licencia:doc_licencia.value,tarjeta:doc_tarjeta.value,
-    permiso:doc_permiso.value,llaves:doc_llaves.value,obs:doc_obs.value
-  },
-  lugar:lugar.value,motivo:motivo.value,
-  consignado:consignado.value,delegacion:delegacion.value,
-  boleta:boleta.value,grua:grua.value,
-  conductor:{nombre:conductor.value,tipoLic:tipoLic.value,doc:documento.value,lic:licencia.value},
-  danos:danos.value,
-  f1:f1.toDataURL(),f2:f2.toDataURL(),f3:f3.toDataURL()
- };
- db.push(r);
- localStorage.setItem(KEY,JSON.stringify(db));
- alert("Consignación guardada");
+  const r={
+    fecha:fecha.value, hora:hora.value,
+    placas:placas.value, marca:marca.value, tipo:tipo.value,
+    color:color.value, nit:nit.value, chasis:chasis.value, motor:motor.value,
+    lugar:lugar.value, motivo:motivo.value, consignado:consignado.value,
+    delegacion:delegacion.value, boleta:boleta.value, grua:grua.value,
+    conductor:{ nombre:conductor.value, tipo:lic_tipo.value, doc:doc.value, lic:lic.value },
+    danos:danos.value
+  };
+  if(!r.fecha||!r.placas) return alert("Fecha y placas obligatorias");
+
+  db.push(r);
+  localStorage.setItem(KEY,JSON.stringify(db));
+  render();
 }
 
-/* PDF */
+/* ===== TABLA ===== */
+function render(){
+  tabla.innerHTML=db.map(x=>`
+    <tr>
+      <td>${x.fecha}</td>
+      <td>${x.hora}</td>
+      <td>${x.placas}</td>
+      <td>${x.conductor.nombre}</td>
+      <td>${x.motivo}</td>
+    </tr>
+  `).join("");
+}
+render();
+
+/* ===== PDF (FIRMAS REALES) ===== */
 function pdf(){
- const r=db.at(-1); if(!r) return;
- const {jsPDF}=window.jspdf;
- const d=new jsPDF({format:"letter"});
- let y=20;
- d.text("CONSIGNACIÓN DE VEHÍCULO — PMT",105,10,{align:"center"});
- Object.entries(r).forEach(([k,v])=>{
-  if(typeof v==="string"){ d.text(`${k.toUpperCase()}: ${v}`,20,y); y+=6;}
- });
- d.save("consignacion_pmt.pdf");
+  const {jsPDF}=window.jspdf;
+  const r=db.at(-1); if(!r) return;
+  const d=new jsPDF({format:"letter"});
+  let y=20;
+
+  d.setFontSize(14);
+  d.text("CONSIGNACIÓN DE VEHÍCULO — PMT",105,y,{align:"center"});
+  y+=12;
+
+  d.setFontSize(10);
+  d.text(`Fecha: ${r.fecha}  Hora: ${r.hora}`,20,y); y+=6;
+  d.text(`Placas: ${r.placas}`,20,y); y+=6;
+  d.text(`Marca: ${r.marca}  Tipo: ${r.tipo}  Color: ${r.color}`,20,y); y+=6;
+  d.text(`NIT: ${r.nit}  Chasis: ${r.chasis}`,20,y); y+=6;
+  d.text(`Lugar: ${r.lugar}`,20,y); y+=6;
+  d.text(`Motivo: ${r.motivo}`,20,y); y+=6;
+  d.text(`Conductor: ${r.conductor.nombre}`,20,y); y+=10;
+
+  d.text("Daños:",20,y); y+=6;
+  d.text(r.danos,20,y,{maxWidth:170});
+
+  d.addImage(firma1.toDataURL(),"PNG",20,200,60,25);
+  d.addImage(firma2.toDataURL(),"PNG",120,200,60,25);
+
+  d.save("consignacion_pmt.pdf");
 }
 
-/* WORD */
+/* ===== WORD (BLANCO) ===== */
 function word(){
- const r=db.at(-1); if(!r) return;
- let t="CONSIGNACIÓN DE VEHÍCULO — PMT\n\n";
- t+=JSON.stringify(r,null,2);
- const b=new Blob([t],{type:"application/msword"});
- const a=document.createElement("a");
- a.href=URL.createObjectURL(b);a.download="consignacion_pmt.doc";a.click();
+  const r=db.at(-1); if(!r) return;
+  const t=`CONSIGNACIÓN DE VEHÍCULO – PMT
+
+Fecha: ${r.fecha}
+Hora: ${r.hora}
+
+Placas: ${r.placas}
+Marca: ${r.marca}
+Tipo: ${r.tipo}
+Color: ${r.color}
+NIT: ${r.nit}
+Chasis: ${r.chasis}
+Motor: ${r.motor}
+
+Lugar: ${r.lugar}
+Motivo: ${r.motivo}
+Conductor: ${r.conductor.nombre}
+
+Daños:
+${r.danos}
+`;
+  const b=new Blob([t],{type:"application/msword"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(b);
+  a.download="consignacion_pmt.doc";
+  a.click();
 }
 
-/* EXCEL */
+/* ===== EXCEL ===== */
 function excel(){
- const ws=XLSX.utils.json_to_sheet(db);
- const wb=XLSX.utils.book_new();
- XLSX.utils.book_append_sheet(wb,ws,"Consignaciones");
- XLSX.writeFile(wb,"consignacion_pmt.xlsx");
+  const ws=XLSX.utils.json_to_sheet(db);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"Consignaciones");
+  XLSX.writeFile(wb,"consignacion_pmt.xlsx");
 }
 
-/* BORRAR */
+/* ===== BORRAR ===== */
 function borrar(){
- if(confirm("¿Borrar todo?")){
-  db=[];localStorage.removeItem(KEY);
- }
+  if(confirm("¿Borrar todo?")){
+    db=[]; localStorage.removeItem(KEY); render();
+  }
 }
 </script>
 </body>
