@@ -473,3 +473,24 @@ tr:nth-child(even) td {
     min-height:60px;           /* no gigante */
   }
 }
+/* ===== BLOQUEO VISUAL HORIZONTAL (USO SOLO VERTICAL) ===== */
+@media (orientation: landscape) {
+  body {
+    overflow: hidden;
+  }
+
+  body::before {
+    content: "⚠️ Este módulo está diseñado solo para uso vertical";
+    position: fixed;
+    inset: 0;
+    background: #050109;
+    color: #00ffc8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 1.1rem;
+    z-index: 9999;
+    padding: 20px;
+  }
+}
