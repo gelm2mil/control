@@ -5,86 +5,65 @@
 <title>Consignación de Vehículo — PMT | GELM 2026</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- LIBRERÍAS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <style>
 body{
   background:#050109;
-  color:#e9f9ff;
-  font-family:Segoe UI,system-ui;
+  color:#000;
+  font-family:Segoe UI,Arial;
   margin:0;
   padding:20px;
 }
 .panel{
-  max-width:1100px;
+  max-width:1000px;
   margin:auto;
-  background:#020510;
+  background:#fff;
   padding:25px;
-  border-radius:22px;
-  box-shadow:0 0 40px #00ffc8;
+  border-radius:10px;
 }
-h1{text-align:center;color:#00ffc8;margin-bottom:4px;}
-.sub{text-align:center;font-size:.8rem;color:#9cb3d8;margin-bottom:18px;}
-h3{color:#00ffc8;margin:22px 0 10px;}
+h1{text-align:center;font-size:18px;margin:0}
+.sub{text-align:center;font-size:12px;margin-bottom:12px}
+
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:10px;
+  gap:8px;
 }
 input,textarea{
   width:100%;
-  padding:10px;
-  border-radius:12px;
-  border:1px solid #00ffc8;
-  background:#000;
-  color:#fff;
+  padding:6px;
+  border:1px solid #000;
+  font-size:12px;
 }
-textarea{min-height:90px;}
+textarea{min-height:60px}
+
 canvas{
   width:100%;
-  height:160px;
+  height:120px;
+  border:1px solid #000;
   background:#fff;
-  border-radius:14px;
-  border:2px dashed #00ffc8;
-  touch-action:none;
 }
+
 .actions{
+  margin-top:15px;
   display:grid;
-  grid-template-columns:1fr;
-  gap:10px;
-  margin-top:20px;
+  gap:8px;
 }
 button{
-  padding:14px;
-  border-radius:999px;
-  border:none;
+  padding:10px;
   font-weight:bold;
   cursor:pointer;
 }
-.btn-save{background:#00ffc8;}
-.btn-pdf{background:#b000ff;color:#fff;}
-.btn-word{background:#007bff;color:#fff;}
-.btn-excel{background:#28a745;color:#fff;}
-.btn-month{background:#ffaa00;color:#000;}
-.btn-del{background:#ff0033;color:#fff;}
-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:22px;
-  font-size:.8rem;
-}
-th{background:#00ffc8;color:#000;padding:6px;}
-td{padding:6px;border-bottom:1px solid #333;text-align:center;}
-footer{text-align:center;font-size:10px;opacity:.6;margin-top:18px;}
 </style>
 </head>
 
 <body>
 <div class="panel">
-<h1>CONSIGNACIÓN DE VEHÍCULO — PMT</h1>
-<div class="sub">Dirigido a: Juzgado de Asuntos Municipales y de Tránsito</div>
+
+<h1>POLICÍA MUNICIPAL DE TRÁNSITO</h1>
+<div class="sub">Municipalidad de Chimaltenango – Consignación de Vehículo</div>
 
 <div class="grid">
   <input type="date" id="fecha">
@@ -109,69 +88,44 @@ footer{text-align:center;font-size:10px;opacity:.6;margin-top:18px;}
   <input id="consignado" placeholder="Consignado por">
   <input id="delegacion" placeholder="Delegación">
   <input id="boleta" placeholder="Boleta">
-  <input id="grua" placeholder="Grúa (SI / NO)">
+  <input id="grua" placeholder="Grúa">
 </div>
 
 <h3>Datos del Conductor</h3>
 <div class="grid">
-  <input id="conductor" placeholder="Nombre del conductor">
+  <input id="conductor" placeholder="Nombre">
   <input id="lic_tipo" placeholder="Tipo licencia">
   <input id="doc" placeholder="Documento">
   <input id="lic" placeholder="No. Licencia">
 </div>
 
-<h3>Daños visibles del vehículo</h3>
+<h3>Daños visibles</h3>
 <textarea id="danos"></textarea>
 
 <h3>Firmas</h3>
 <div class="grid">
-  <canvas id="f1"></canvas>
-  <canvas id="f2"></canvas>
-  <canvas id="f3"></canvas>
+  <canvas id="f1" width="300" height="120"></canvas>
+  <canvas id="f2" width="300" height="120"></canvas>
+  <canvas id="f3" width="300" height="120"></canvas>
 </div>
 
 <div class="actions">
-  <button class="btn-save" onclick="guardar()">Guardar</button>
-  <button class="btn-pdf" onclick="exportarPDF()">PDF</button>
-  <button class="btn-word" onclick="exportarWord()">Word</button>
-  <button class="btn-excel" onclick="exportarExcel()">Excel</button>
-  <button class="btn-month" onclick="excelMes()">Excel por mes</button>
-  <button class="btn-del" onclick="borrar()">Borrar</button>
+  <button onclick="exportarPDF()">GENERAR PDF OFICIAL</button>
 </div>
 
-<table>
-<thead>
-<tr>
-  <th>#</th><th>Fecha</th><th>Hora</th><th>Placas</th><th>Marca</th><th>Motivo</th>
-</tr>
-</thead>
-<tbody id="tabla"></tbody>
-</table>
-
-<footer>© 2026 — Sistema GELM — PMT</footer>
 </div>
 
 <script>
-const KEY="CONSIGNACION_PMT_GELM";
-let db=JSON.parse(localStorage.getItem(KEY)||"[]");
-
-/* ===== FIRMA ESTABLE ===== */
-function activarFirma(id){
-  const c=document.getElementById(id);
+function activarFirma(c){
   const ctx=c.getContext("2d");
-
-  function resize(){
-    c.width=c.offsetWidth;
-    c.height=c.offsetHeight;
-    ctx.lineWidth=2;
-    ctx.lineCap="round";
-  }
-  resize(); window.addEventListener("resize",resize);
-
+  ctx.lineWidth=2;
+  ctx.lineCap="round";
   let dib=false;
+
   c.addEventListener("pointerdown",e=>{
-    e.preventDefault();dib=true;
-    ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);
+    dib=true;
+    ctx.beginPath();
+    ctx.moveTo(e.offsetX,e.offsetY);
   });
   c.addEventListener("pointermove",e=>{
     if(!dib) return;
@@ -181,159 +135,46 @@ function activarFirma(id){
   c.addEventListener("pointerup",()=>dib=false);
   c.addEventListener("pointerleave",()=>dib=false);
 }
-["f1","f2","f3"].forEach(activarFirma);
+["f1","f2","f3"].forEach(id=>activarFirma(document.getElementById(id)));
 
-/* ===== GUARDAR ===== */
-function guardar(){
-  if(!fecha.value||!placas.value){
-    alert("Fecha y placas obligatorias");
-    return;
-  }
-  const r={
-    fecha:fecha.value,hora:hora.value,
-    placas:placas.value,marca:marca.value,tipo:tipo.value,color:color.value,
-    nit:nit.value,chasis:chasis.value,motor:motor.value,
-    lugar:lugar.value,motivo:motivo.value,consignado:consignado.value,
-    delegacion:delegacion.value,boleta:boleta.value,grua:grua.value,
-    conductor:{
-      nombre:conductor.value,
-      tipo:lic_tipo.value,
-      doc:doc.value,
-      lic:lic.value
-    },
-    danos:danos.value,
-    firmas:[
-      f1.toDataURL("image/png"),
-      f2.toDataURL("image/png"),
-      f3.toDataURL("image/png")
-    ]
-  };
-  db.push(r);
-  localStorage.setItem(KEY,JSON.stringify(db));
-  render();
-}
-
-/* ===== TABLA ===== */
-function render(){
-  tabla.innerHTML=db.map((x,i)=>`
-    <tr>
-      <td>${i+1}</td>
-      <td>${x.fecha}</td>
-      <td>${x.hora}</td>
-      <td>${x.placas}</td>
-      <td>${x.marca}</td>
-      <td>${x.motivo}</td>
-    </tr>`).join("");
-}
-render();
-
-/* ===== PDF INSTITUCIONAL ===== */
 function exportarPDF(){
-  const r=db.at(-1); if(!r) return;
   const {jsPDF}=window.jspdf;
   const d=new jsPDF({format:"letter"});
-  let y=20;
+  let y=15;
 
-  d.setFontSize(14);
-  d.text("CONSIGNACIÓN DE VEHÍCULO — PMT",105,y,{align:"center"});
-  y+=12;
+  d.setFontSize(12);
+  d.text("CONSIGNACIÓN DE VEHÍCULO – PMT",105,y,{align:"center"});
+  y+=10;
 
   d.setFontSize(10);
-  const datos={
-    Fecha:r.fecha,Hora:r.hora,
-    Placas:r.placas,Marca:r.marca,Tipo:r.tipo,Color:r.color,
-    NIT:r.nit,Chasis:r.chasis,Motor:r.motor,
-    Lugar:r.lugar,Motivo:r.motivo,
-    Conductor:r.conductor.nombre,
-    Licencia:r.conductor.tipo,
-    Documento:r.conductor.doc,
-    NoLicencia:r.conductor.lic
-  };
-  Object.entries(datos).forEach(([k,v])=>{
-    d.text(`${k}: ${v||""}`,20,y);
+  const datos=[
+    ["Fecha",fecha.value],["Hora",hora.value],
+    ["Placas",placas.value],["Marca",marca.value],
+    ["Tipo",tipo.value],["Color",color.value],
+    ["NIT",nit.value],["Chasis",chasis.value],
+    ["Motor",motor.value],["Lugar",lugar.value],
+    ["Motivo",motivo.value],
+    ["Conductor",conductor.value],
+    ["Licencia",lic_tipo.value],
+    ["Documento",doc.value],
+    ["No Licencia",lic.value]
+  ];
+
+  datos.forEach(dato=>{
+    d.text(`${dato[0]}: ${dato[1]||""}`,20,y);
     y+=5;
   });
 
   d.text("Daños visibles:",20,y); y+=5;
-  d.text(r.danos||"",20,y,{maxWidth:170});
+  d.text(danos.value||"",20,y,{maxWidth:170});
 
-  d.addImage(r.firmas[0],"PNG",20,220,50,25);
-  d.addImage(r.firmas[1],"PNG",80,220,50,25);
-  d.addImage(r.firmas[2],"PNG",140,220,50,25);
+  d.addImage(f1.toDataURL(),"PNG",20,220,50,20);
+  d.addImage(f2.toDataURL(),"PNG",80,220,50,20);
+  d.addImage(f3.toDataURL(),"PNG",140,220,50,20);
 
-  d.save("CONSIGNACION_PMT.pdf");
-}
-
-/* ===== WORD ===== */
-function exportarWord(){
-  const r=db.at(-1); if(!r) return;
-  const t=`CONSIGNACIÓN DE VEHÍCULO – PMT
-
-Fecha: ${r.fecha}
-Hora: ${r.hora}
-
-PLACA: ${r.placas}
-MARCA: ${r.marca}
-TIPO: ${r.tipo}
-COLOR: ${r.color}
-NIT: ${r.nit}
-CHASIS: ${r.chasis}
-MOTOR: ${r.motor}
-
-LUGAR: ${r.lugar}
-MOTIVO: ${r.motivo}
-
-CONDUCTOR:
-Nombre: ${r.conductor.nombre}
-Tipo Licencia: ${r.conductor.tipo}
-Documento: ${r.conductor.doc}
-No Licencia: ${r.conductor.lic}
-
-DAÑOS:
-${r.danos}
-`;
-  const b=new Blob([t],{type:"application/msword"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(b);
-  a.download="CONSIGNACION_PMT.doc";
-  a.click();
-}
-
-/* ===== EXCEL ===== */
-function exportarExcel(){
-  const plano=db.map(r=>({
-    Fecha:r.fecha,Hora:r.hora,Placas:r.placas,Marca:r.marca,
-    Tipo:r.tipo,Color:r.color,
-    Conductor:r.conductor.nombre,
-    Licencia:r.conductor.tipo,
-    Documento:r.conductor.doc,
-    NoLicencia:r.conductor.lic,
-    Motivo:r.motivo
-  }));
-  const ws=XLSX.utils.json_to_sheet(plano);
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,"Consignaciones");
-  XLSX.writeFile(wb,"CONSIGNACION_PMT.xlsx");
-}
-
-/* ===== EXCEL POR MES ===== */
-function excelMes(){
-  const m=prompt("Mes (YYYY-MM):");
-  if(!m) return;
-  const f=db.filter(x=>x.fecha.startsWith(m));
-  if(!f.length){alert("Sin registros");return;}
-  const ws=XLSX.utils.json_to_sheet(f);
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,m);
-  XLSX.writeFile(wb,`CONSIGNACION_${m}.xlsx`);
-}
-
-/* ===== BORRAR ===== */
-function borrar(){
-  if(confirm("¿Borrar todo?")){
-    db=[];localStorage.removeItem(KEY);render();
-  }
+  d.save("CONSIGNACION_PMT_2026.pdf");
 }
 </script>
+
 </body>
 </html>
