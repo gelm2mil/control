@@ -23,9 +23,9 @@ body{
   background:#020510;
   padding:25px;
   border-radius:22px;
-  box-shadow:0 0 30px #00ffc8;
+  box-shadow:0 0 35px #00ffc8;
 }
-h1{text-align:center;color:#00ffc8;margin-bottom:4px;}
+h1{text-align:center;color:#00ffc8;margin-bottom:5px;}
 .sub{text-align:center;font-size:.8rem;color:#9cb3d8;margin-bottom:20px;}
 h3{color:#00ffc8;margin:22px 0 10px;}
 label{font-size:.7rem;color:#9cb3d8;text-transform:uppercase;}
@@ -35,27 +35,22 @@ label{font-size:.7rem;color:#9cb3d8;text-transform:uppercase;}
   grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
   gap:10px;
 }
-.grid-2{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
 
 input,textarea{
   width:100%;
   padding:10px;
-  border-radius:10px;
+  border-radius:12px;
   border:1px solid #00ffc8;
   background:#000;
   color:#fff;
 }
-textarea{min-height:90px}
+textarea{minmin-height:90px;}
 
 canvas{
   width:100%;
   height:160px;
   background:#fff;
-  border-radius:12px;
+  border-radius:14px;
   border:2px dashed #00ffc8;
   touch-action:none;
 }
@@ -64,12 +59,11 @@ canvas{
   display:grid;
   grid-template-columns:1fr;
   gap:10px;
-  margin-top:18px;
+  margin-top:20px;
 }
-.actions button{width:100%;}
 
 button{
-  padding:12px;
+  padding:14px;
   border-radius:999px;
   border:none;
   font-weight:bold;
@@ -101,9 +95,9 @@ footer{text-align:center;font-size:10px;opacity:.6;margin-top:18px;}
 <div class="sub">Dirigido a: Juzgado de Asuntos Municipales y de Tránsito</div>
 
 <!-- FECHA / HORA -->
-<div class="grid-2">
-  <div><label>Fecha</label><input type="date" id="fecha"></div>
-  <div><label>Hora</label><input type="time" id="hora"></div>
+<div class="grid">
+  <input type="date" id="fecha">
+  <input type="time" id="hora">
 </div>
 
 <h3>Datos del Vehículo</h3>
@@ -124,9 +118,6 @@ footer{text-align:center;font-size:10px;opacity:.6;margin-top:18px;}
   <input id="consignado" placeholder="Consignado por">
   <input id="delegacion" placeholder="Delegación">
   <input id="boleta" placeholder="Boleta">
-</div>
-
-<div class="grid-2">
   <input id="grua" placeholder="Grúa (SI / NO)">
 </div>
 
@@ -161,7 +152,12 @@ footer{text-align:center;font-size:10px;opacity:.6;margin-top:18px;}
 <table>
 <thead>
 <tr>
-  <th>#</th><th>Fecha</th><th>Hora</th><th>Placas</th><th>Marca</th><th>Motivo</th>
+  <th>#</th>
+  <th>Fecha</th>
+  <th>Hora</th>
+  <th>Placas</th>
+  <th>Marca</th>
+  <th>Motivo</th>
 </tr>
 </thead>
 <tbody id="tabla"></tbody>
@@ -174,22 +170,24 @@ footer{text-align:center;font-size:10px;opacity:.6;margin-top:18px;}
 const KEY="CONSIGNACION_PMT_GELM";
 let db=JSON.parse(localStorage.getItem(KEY)||"[]");
 
-/* ===== FIRMAS ESTABLES ===== */
+/* ===== FIRMAS ===== */
 function firma(id){
-  const c=document.getElementById(id),ctx=c.getContext("2d");
-  const resize=()=>{c.width=c.offsetWidth;c.height=c.offsetHeight;ctx.lineWidth=2;ctx.lineCap="round";};
+  const c=document.getElementById(id);
+  const ctx=c.getContext("2d");
+  const resize=()=>{ c.width=c.offsetWidth; c.height=c.offsetHeight; ctx.lineWidth=2; ctx.lineCap="round"; };
   resize(); window.addEventListener("resize",resize);
   let d=false;
-  c.onpointerdown=e=>{d=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);}
-  c.onpointermove=e=>{if(d){ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();}}
-  c.onpointerup=()=>d=false; c.onpointerleave=()=>d=false;
+  c.addEventListener("pointerdown",e=>{d=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);});
+  c.addEventListener("pointermove",e=>{if(!d)return;ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();});
+  c.addEventListener("pointerup",()=>d=false);
+  c.addEventListener("pointerleave",()=>d=false);
 }
 ["f1","f2","f3"].forEach(firma);
 
 /* ===== GUARDAR ===== */
 function guardar(){
   if(!fecha.value||!placas.value){alert("Fecha y placas obligatorias");return;}
-  const r={
+  db.push({
     fecha:fecha.value,hora:hora.value,
     placas:placas.value,marca:marca.value,tipo:tipo.value,color:color.value,
     nit:nit.value,chasis:chasis.value,motor:motor.value,
@@ -198,29 +196,26 @@ function guardar(){
     conductor:{nombre:conductor.value,tipo:lic_tipo.value,doc:doc.value,lic:lic.value},
     danos:danos.value,
     firmas:[f1.toDataURL(),f2.toDataURL(),f3.toDataURL()]
-  };
-  db.push(r);
+  });
   localStorage.setItem(KEY,JSON.stringify(db));
   render();
 }
-
-/* ===== TABLA ===== */
 function render(){
   tabla.innerHTML=db.map((x,i)=>`
-    <tr>
-      <td>${i+1}</td>
-      <td>${x.fecha}</td>
-      <td>${x.hora}</td>
-      <td>${x.placas}</td>
-      <td>${x.marca}</td>
-      <td>${x.motivo}</td>
-    </tr>`).join("");
+  <tr>
+    <td>${i+1}</td>
+    <td>${x.fecha}</td>
+    <td>${x.hora}</td>
+    <td>${x.placas}</td>
+    <td>${x.marca}</td>
+    <td>${x.motivo}</td>
+  </tr>`).join("");
 }
 render();
 
 /* ===== PDF ===== */
 function pdf(){
-  const r=db.at(-1); if(!r) return;
+  const r=db.at(-1); if(!r)return;
   const {jsPDF}=window.jspdf;
   const d=new jsPDF({format:"letter"});
   let y=20;
@@ -231,7 +226,7 @@ function pdf(){
     Tipo:r.tipo,Color:r.color,NIT:r.nit,Chasis:r.chasis,Motor:r.motor,
     Lugar:r.lugar,Motivo:r.motivo,Conductor:r.conductor.nombre
   }).forEach(([k,v])=>{d.text(`${k}: ${v||""}`,20,y);y+=5;});
-  d.text("Daños:",20,y);y+=5;
+  d.text("Daños:",20,y); y+=5;
   d.text(r.danos||"",20,y,{maxWidth:170});
   d.addImage(r.firmas[0],"PNG",20,220,50,25);
   d.addImage(r.firmas[1],"PNG",80,220,50,25);
@@ -239,9 +234,9 @@ function pdf(){
   d.save("consignacion_pmt.pdf");
 }
 
-/* ===== WORD INDIVIDUAL ===== */
+/* ===== WORD ===== */
 function word(){
-  const r=db.at(-1); if(!r) return;
+  const r=db.at(-1); if(!r)return;
   const t=`CONSIGNACIÓN DE VEHÍCULO – PMT
 
 Fecha: ${r.fecha}
@@ -250,6 +245,10 @@ Placas: ${r.placas}
 Marca: ${r.marca}
 Tipo: ${r.tipo}
 Color: ${r.color}
+NIT: ${r.nit}
+Chasis: ${r.chasis}
+Motor: ${r.motor}
+
 Lugar: ${r.lugar}
 Motivo: ${r.motivo}
 Conductor: ${r.conductor.nombre}
@@ -265,17 +264,17 @@ ${r.danos}`;
 
 /* ===== WORD POR MES ===== */
 function wordMes(){
-  const m=prompt("Mes (YYYY-MM):"); if(!m) return;
+  const m=prompt("Mes (YYYY-MM):"); if(!m)return;
   const f=db.filter(x=>x.fecha.startsWith(m));
   if(!f.length){alert("Sin registros");return;}
-  let t=`CONSIGNACIONES PMT — ${m}\n\n`;
-  f.forEach((r,i)=>{
-    t+=`${i+1}) ${r.fecha} ${r.hora} — ${r.placas} — ${r.marca} — ${r.motivo}\n`;
-  });
+  const t=f.map((r,i)=>`#${i+1}
+Fecha:${r.fecha} Hora:${r.hora}
+Placas:${r.placas} Marca:${r.marca}
+Motivo:${r.motivo}\n`).join("\n");
   const b=new Blob([t],{type:"application/msword"});
   const a=document.createElement("a");
   a.href=URL.createObjectURL(b);
-  a.download=`consignaciones_${m}.doc`;
+  a.download=`consignacion_${m}.doc`;
   a.click();
 }
 
@@ -289,7 +288,7 @@ function excel(){
 
 /* ===== EXCEL POR MES ===== */
 function excelMes(){
-  const m=prompt("Mes (YYYY-MM):"); if(!m) return;
+  const m=prompt("Mes (YYYY-MM):"); if(!m)return;
   const f=db.filter(x=>x.fecha.startsWith(m));
   if(!f.length){alert("Sin registros");return;}
   const ws=XLSX.utils.json_to_sheet(f);
