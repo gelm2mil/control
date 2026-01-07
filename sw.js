@@ -1,4 +1,4 @@
-const CACHE_NAME = "gelm-control-v5";
+const CACHE_NAME = "gelm-control-simple-v1";
 
 const FILES_TO_CACHE = [
   "/control/consignacion_pwa.html",
@@ -8,7 +8,7 @@ const FILES_TO_CACHE = [
   "/control/icons/icon-512.png"
 ];
 
-/* ===== INSTALL ===== */
+// INSTALACIÓN
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(FILES_TO_CACHE))
@@ -16,7 +16,7 @@ self.addEventListener("install", event => {
   self.skipWaiting();
 });
 
-/* ===== ACTIVATE ===== */
+// ACTIVACIÓN
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -28,18 +28,11 @@ self.addEventListener("activate", event => {
   self.clients.claim();
 });
 
-/* ===== FETCH (NETWORK FIRST PARA JS/HTML) ===== */
+// FETCH: SOLO CACHE SI EXISTE
 self.addEventListener("fetch", event => {
-  const req = event.request;
-
-  // 🔥 HTML y JS SIEMPRE DESDE RED
-  if (req.destination === "document" || req.destination === "script") {
-    event.respondWith(fetch(req).catch(() => caches.match(req)));
-    return;
-  }
-
-  // CSS / ICONOS desde cache
   event.respondWith(
-    caches.match(req).then(res => res || fetch(req))
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request);
+    })
   );
 });
