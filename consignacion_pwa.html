@@ -2,63 +2,46 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <title>Consignación de Vehículo — PMT | GELM 2026</title>
 
 <link rel="stylesheet" href="styles.css">
 
-<!-- MANIFEST -->
-<link rel="manifest" href="manifest-consignacion.json">
-<meta name="theme-color" content="#00ffc8">
-
-<!-- LIBRERÍAS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
+<!-- MANIFEST PWA -->
+<link rel="manifest" href="manifest-consignacion.json">
+<meta name="theme-color" content="#00ffc8">
+
 <style>
-/* AVISO NO BLOQUEANTE (PWA SAFE) */
-.aviso-vertical{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:#050109;
-  color:#00ffc8;
-  align-items:center;
-  justify-content:center;
-  z-index:50;
-  font-size:1rem;
-  text-align:center;
-}
-
-@media (max-width:900px) and (orientation: landscape){
-  .aviso-vertical{ display:flex; }
-}
-
-body{
-  margin:0;
-  background:radial-gradient(circle at top,#24002b,#060012);
-  font-family:system-ui;
-  color:#e9f9ff;
+@media (orientation: landscape){
+  body::before{
+    content:"⚠️ Este módulo está diseñado solo para uso vertical";
+    position:fixed; inset:0;
+    background:#050109;
+    color:#00ffc8;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+    font-size:1rem;
+  }
 }
 
 .consignacion-box{
-  max-width:480px;
-  margin:20px auto;
   background:rgba(0,0,0,.75);
   border-radius:22px;
   padding:20px;
   box-shadow:0 0 35px rgba(0,255,200,.4);
 }
 
-.titulo{text-align:center;color:#00ffc8;font-size:1.4rem;}
-.subtitulo{text-align:center;color:#9cb3d8;font-size:.8rem;margin-bottom:18px;}
+.titulo{text-align:center;color:#00ffc8;font-size:1.5rem;}
+.subtitulo{text-align:center;color:#9cb3d8;font-size:.85rem;margin-bottom:18px;}
 
 .campo{margin-bottom:14px;}
-.campo label{
-  display:block;font-size:.7rem;color:#9cb3d8;
-  margin-bottom:6px;text-transform:uppercase;
-}
+.campo label{display:block;font-size:.7rem;color:#9cb3d8;margin-bottom:6px;text-transform:uppercase;}
 .campo input,.campo textarea{
   width:100%;padding:14px;border-radius:999px;
   border:1px solid rgba(0,255,200,.45);
@@ -78,14 +61,15 @@ body{
 }
 
 .botones{
-  display:grid;grid-template-columns:1fr 1fr;
-  gap:12px;margin-top:22px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:22px;
 }
 .botones button{
   padding:16px;border-radius:999px;
-  font-size:1rem;font-weight:bold;border:none;cursor:pointer;
+  font-size:1rem;font-weight:bold;border:none;
 }
-
 .btn-save{background:#00c98a;}
 .btn-pdf{background:#b000ff;color:#fff;}
 .btn-word{background:#007bff;color:#fff;}
@@ -101,11 +85,7 @@ footer{text-align:center;font-size:10px;opacity:.6;margin-top:18px;}
 </head>
 
 <body>
-
-<div class="aviso-vertical">
-⚠️ Este módulo está diseñado solo para uso vertical
-</div>
-
+<div class="contenedor">
 <div class="consignacion-box">
 
 <div class="titulo">CONSIGNACIÓN DE VEHÍCULO — PMT</div>
@@ -164,13 +144,16 @@ footer{text-align:center;font-size:10px;opacity:.6;margin-top:18px;}
 
 <footer>© 2026 — Sistema GELM — PMT</footer>
 </div>
+</div>
 
-<!-- SERVICE WORKER (ÚNICO Y CORRECTO) -->
+<!-- ✅ REGISTRO SERVICE WORKER (LO QUE FALTABA) -->
 <script>
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/control/sw.js")
-    .then(reg => console.log("SW OK:", reg.scope))
-    .catch(err => console.error("SW ERROR:", err));
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js")
+      .then(reg => console.log("SW registrado:", reg.scope))
+      .catch(err => console.error("SW error:", err));
+  });
 }
 </script>
 
