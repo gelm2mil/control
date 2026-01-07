@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -11,8 +12,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-<!-- MANIFEST PWA -->
-<link rel="manifest" href="manifest-consignacion.json">
+<link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#00ffc8">
 
 <style>
@@ -146,16 +146,175 @@ footer{text-align:center;font-size:10px;opacity:.6;margin-top:18px;}
 </div>
 </div>
 
-<!-- ✅ REGISTRO SERVICE WORKER (LO QUE FALTABA) -->
 <script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js")
-      .then(reg => console.log("SW registrado:", reg.scope))
-      .catch(err => console.error("SW error:", err));
+const KEY="CONSIGNACION_PMT_GELM";
+let db=JSON.parse(localStorage.getItem(KEY)||"[]");
+
+/* ===== FIRMAS ===== */
+function firmaCanvas(id){
+  const c=document.getElementById(id);
+  const ctx=c.getContext("2d");
+  c.width=c.offsetWidth; c.height=c.offsetHeight;
+  ctx.lineWidth=2; ctx.lineCap="round";
+  let d=false;
+  c.addEventListener("pointerdown",e=>{d=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);});
+  c.addEventListener("pointermove",e=>{if(!d)return;ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();});
+  c.addEventListener("pointerup",()=>d=false);
+}
+["f1","f2","f3"].forEach(firmaCanvas);
+
+/* ===== GUARDAR ===== */
+function guardar(){
+  db.push({
+    fecha:fecha.value,hora:hora.value,
+    placas:placas.value,marca:marca.value,tipo:tipo.value,color:color.value,
+    nit:nit.value,chasis:chasis.value,motor:motor.value,
+    lugar:lugar.value,motivo:motivo.value,consignado:consignado.value,
+    delegacion:delegacion.value,boleta:boleta.value,grua:grua.value,
+    conductor:{nombre:conductor.value,tipo:lic_tipo.value,doc:doc.value,lic:lic.value},
+    danos:danos.value,
+    firmas:[f1.toDataURL(),f2.toDataURL(),f3.toDataURL()]
   });
+  localStorage.setItem(KEY,JSON.stringify(db));
+  render();
+}
+
+/* ===== HISTORIAL ===== */
+function render(){
+  tabla.innerHTML=db.map((x,i)=>`
+    <div>${i+1}. ${x.fecha} ${x.hora||""} — ${x.placas} — ${x.motivo}</div>
+  `).join("");
+}
+render();
+
+/* ===== PDF COMPLETO + FIRMAS ===== */
+function pdf(){
+  const r=db.at(-1); if(!r){alert("No hay registros");return;}
+  const { jsPDF }=window.jspdf;
+  const d=new jsPDF("p","mm","letter");
+  let y=15;
+
+  d.setFontSize(12);
+  d.text("CONSIGNACIÓN DE VEHÍCULO — PMT",105,y,{align:"center"});
+  y+=10;
+  d.setFontSize(9);
+
+  const campos=[
+    ["Fecha",r.fecha],["Hora",r.hora],["Placas",r.placas],["Marca",r.marca],
+    ["Tipo",r.tipo],["Color",r.color],["NIT",r.nit],["Chasis",r.chasis],
+    ["Motor",r.motor],["Lugar",r.lugar],["Motivo",r.motivo],
+    ["Consignado por",r.consignado],["Delegación",r.delegacion],
+    ["Boleta",r.boleta],["Grúa",r.grua],
+    ["Conductor",r.conductor.nombre],["Tipo Licencia",r.conductor.tipo],
+    ["Documento",r.conductor.doc],["No. Licencia",r.conductor.lic]
+  ];
+
+  campos.forEach(c=>{
+    if(y>250){d.addPage();y=15;}
+    d.text(`${c[0]}: ${c[1]||""}`,15,y); y+=6;
+  });
+
+  if(r.danos){
+    y+=4; d.text("Daños:",15,y); y+=6;
+    d.text(r.danos,15,y,{maxWidth:180}); y+=20;
+  }
+
+  if(y>200){d.addPage();y=20;}
+  d.text("Firmas:",15,y); y+=5;
+  d.addImage(r.firmas[0],"PNG",15,y,55,25);
+  d.addImage(r.firmas[1],"PNG",80,y,55,25);
+  d.addImage(r.firmas[2],"PNG",145,y,55,25);
+
+  d.save("consignacion_pmt.pdf");
+}
+
+/* ===== WORD COMPLETO ===== */
+function word(){
+  const r=db.at(-1); if(!r)return;
+  const t=`CONSIGNACIÓN DE VEHÍCULO – PMT
+
+Fecha: ${r.fecha}
+Hora: ${r.hora}
+
+Placas: ${r.placas}
+Marca: ${r.marca}
+Tipo: ${r.tipo}
+Color: ${r.color}
+NIT: ${r.nit}
+Chasis: ${r.chasis}
+Motor: ${r.motor}
+
+Lugar: ${r.lugar}
+Motivo: ${r.motivo}
+Consignado por: ${r.consignado}
+Delegación: ${r.delegacion}
+Boleta: ${r.boleta}
+Grúa: ${r.grua}
+
+Conductor: ${r.conductor.nombre}
+Tipo Licencia: ${r.conductor.tipo}
+Documento: ${r.conductor.doc}
+No. Licencia: ${r.conductor.lic}
+
+DAÑOS:
+${r.danos||"Ninguno"}
+`;
+  const b=new Blob([t],{type:"application/msword"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(b);
+  a.download="consignacion_pmt.doc";
+  a.click();
+}
+
+/* ===== EXCEL ===== */
+function excel(){
+  const plano=db.map(r=>({
+    Fecha:r.fecha,Hora:r.hora,Placas:r.placas,Marca:r.marca,
+    Tipo:r.tipo,Color:r.color,NIT:r.nit,Chasis:r.chasis,Motor:r.motor,
+    Lugar:r.lugar,Motivo:r.motivo,Consignado:r.consignado,
+    Delegación:r.delegacion,Boleta:r.boleta,Grua:r.grua,
+    Conductor:r.conductor.nombre,TipoLicencia:r.conductor.tipo,
+    Documento:r.conductor.doc,NoLicencia:r.conductor.lic,Daños:r.danos
+  }));
+  const ws=XLSX.utils.json_to_sheet(plano);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"Consignaciones");
+  XLSX.writeFile(wb,"consignacion_pmt.xlsx");
+}
+
+/* ===== EXCEL POR MES ===== */
+function excelMes(){
+  const mes=(fecha.value||"").slice(0,7);
+  const f=db.filter(r=>r.fecha.startsWith(mes));
+  if(!f.length){alert("No hay registros de ese mes");return;}
+  const ws=XLSX.utils.json_to_sheet(f.map(r=>({
+    Fecha:r.fecha,Placas:r.placas,Motivo:r.motivo
+  })));
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,mes);
+  XLSX.writeFile(wb,`consignacion_${mes}.xlsx`);
+}
+
+/* ===== WORD POR MES ===== */
+function wordMes(){
+  const mes=(fecha.value||"").slice(0,7);
+  const f=db.filter(r=>r.fecha.startsWith(mes));
+  if(!f.length){alert("No hay registros");return;}
+  let t=`CONSIGNACIONES ${mes}\n\n`;
+  f.forEach((r,i)=>{t+=`${i+1}. ${r.fecha} ${r.placas} — ${r.motivo}\n`;});
+  const b=new Blob([t],{type:"application/msword"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(b);
+  a.download=`consignacion_${mes}.doc`;
+  a.click();
+}
+
+/* ===== BORRAR ===== */
+function borrar(){
+  if(confirm("¿Borrar todo?")){
+    db=[];localStorage.removeItem(KEY);render();
+  }
 }
 </script>
-
 </body>
 </html>
