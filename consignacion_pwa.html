@@ -206,6 +206,13 @@ function borrar(){
   }
 }
 </script>
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("service-worker.js")
+    .then(() => console.log("✔ Service Worker GELM activo"))
+    .catch(err => console.error("SW error:", err));
+}
+</script>
 
 </body>
 </html>
