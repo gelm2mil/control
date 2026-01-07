@@ -1,8 +1,8 @@
 {
   "name": "Consignación PMT",
   "short_name": "Consignación",
-  "start_url": "./consignacion_pwa.html",
-  "scope": "./",
+  "start_url": "/control/consignacion_pwa.html",
+  "scope": "/control/",
   "display": "standalone",
   "background_color": "#020510",
   "theme_color": "#00ffc8",
