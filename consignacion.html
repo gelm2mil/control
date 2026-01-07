@@ -2,8 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <title>Consignación de Vehículo — PMT | GELM 2026</title>
 
@@ -15,65 +14,40 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <style>
-body{
-  margin:0;
-  background:radial-gradient(circle at top,#002b2b,#020510);
-  color:#eaffff;
-  font-family:system-ui;
-}
-
-/* SOLO MÓVIL */
-@media (orientation: landscape){
-  body::before{
-    content:"⚠ Este módulo está diseñado solo para uso vertical";
-    position:fixed;
-    inset:0;
-    background:#020510;
-    color:#00ffc8;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:1rem;
-    z-index:9999;
-  }
-}
-
-.contenedor{
-  max-width:480px;
-  margin:14px auto;
-  padding:12px;
-}
-
-.panel{
+/* ===== CONTENEDOR ===== */
+.consignacion-box{
   background:rgba(0,0,0,.78);
-  border-radius:20px;
+  border-radius:22px;
   padding:18px;
-  box-shadow:0 0 30px rgba(0,255,200,.45);
+  box-shadow:0 0 35px rgba(0,255,200,.45);
+  max-width:520px;
+  margin:auto;
 }
 
-h1{
+/* ===== TITULOS ===== */
+.titulo{
   text-align:center;
   color:#00ffc8;
-  font-size:1.2rem;
-  margin:0;
+  font-size:1.4rem;
 }
-.sub{
+.subtitulo{
   text-align:center;
-  font-size:.75rem;
   color:#9cb3d8;
+  font-size:.8rem;
   margin-bottom:14px;
 }
 
-.grupo{
-  margin-bottom:12px;
+/* ===== CAMPOS TIPO AGENDA ===== */
+.campo{
+  margin-bottom:10px;
 }
-label{
+.campo label{
   display:block;
   font-size:.7rem;
   color:#00ffc8;
   margin-bottom:4px;
 }
-input,textarea{
+.campo input{
   width:100%;
   padding:12px;
   border-radius:999px;
@@ -82,184 +56,186 @@ input,textarea{
   color:#fff;
   font-size:.95rem;
 }
-textarea{
-  border-radius:14px;
-  min-height:70px;
-}
 
-/* FIRMA */
-.firma{
-  margin-top:12px;
+/* ===== FIRMA ===== */
+.firma-box{
+  margin-top:14px;
 }
-canvas{
+.firma-box label{
+  color:#00ffc8;
+  font-size:.75rem;
+}
+.firma-box canvas{
   width:100%;
-  height:160px;
+  height:180px;
   background:#fff;
   border-radius:14px;
-  border:2px dashed #00ffc8;
+  border:2px dashed rgba(0,255,200,.9);
   touch-action:none;
 }
 
-/* BOTONES */
+/* ===== BOTONES ===== */
 .botones{
-  margin-top:16px;
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
+  margin-top:16px;
 }
-button{
-  padding:12px;
+.botones button{
+  padding:14px;
   border-radius:999px;
   border:none;
   font-weight:600;
   font-size:.85rem;
 }
-.guardar{background:#00c98a}
-.actualizar{background:#8b5cf6;color:#fff}
-.pdf{background:#a855f7;color:#fff}
-.word{background:#2563eb;color:#fff}
-.excel{background:#16a34a;color:#fff}
-.em{background:#d97706;color:#fff}
-.wm{background:#b45309;color:#fff}
-.borrar{background:#dc2626;color:#fff}
+.btn-save{background:#00c98a}
+.btn-update{background:#8b5cf6}
+.btn-pdf{background:#a855f7;color:#fff}
+.btn-word{background:#2563eb;color:#fff}
+.btn-excel{background:#16a34a;color:#fff}
+.btn-em{background:#d97706;color:#000}
+.btn-wm{background:#b45309;color:#fff}
+.btn-del{background:#dc2626;color:#fff}
 
-.registros{
-  margin-top:18px;
-}
-.reg{
-  background:#021b1b;
-  border-radius:14px;
-  padding:10px;
-  margin-bottom:8px;
+/* ===== HISTORIAL ===== */
+.historial{
+  margin-top:16px;
   font-size:.75rem;
 }
-.reg small{color:#9cb3d8}
-
+.historial div{
+  background:rgba(0,255,200,.08);
+  padding:8px;
+  border-radius:10px;
+  margin-bottom:6px;
+}
 footer{
   text-align:center;
-  font-size:.65rem;
+  font-size:10px;
   opacity:.6;
-  margin-top:12px;
+  margin-top:10px;
 }
 </style>
 </head>
 
 <body>
-<div class="contenedor">
-<div class="panel">
 
-<h1>CONSIGNACIÓN DE VEHÍCULO — PMT</h1>
-<div class="sub">Juzgado de Asuntos Municipales y de Tránsito</div>
+<div class="consignacion-box">
 
-<div class="grupo"><label>Fecha</label><input type="date" id="fecha"></div>
-<div class="grupo"><label>Hora</label><input type="time" id="hora"></div>
-<div class="grupo"><label>Placas</label><input id="placas"></div>
-<div class="grupo"><label>Marca</label><input id="marca"></div>
-<div class="grupo"><label>Motivo</label><input id="motivo"></div>
+<div class="titulo">CONSIGNACIÓN DE VEHÍCULO — PMT</div>
+<div class="subtitulo">Juzgado de Asuntos Municipales y de Tránsito</div>
 
-<div class="firma">
-<label>Firma Guardián</label>
+<div class="campo"><label>Fecha</label><input type="date" id="fecha"></div>
+<div class="campo"><label>Hora</label><input type="time" id="hora"></div>
+<div class="campo"><label>Placas</label><input id="placas"></div>
+<div class="campo"><label>Marca</label><input id="marca"></div>
+<div class="campo"><label>Motivo</label><input id="motivo"></div>
+
+<div class="firma-box">
+<label>Firma guardián</label>
 <canvas id="firma"></canvas>
 </div>
 
 <div class="botones">
-<button class="guardar" onclick="guardar()">Guardar</button>
-<button class="actualizar" onclick="actualizar()">Actualizar</button>
-<button class="pdf" onclick="pdf()">PDF</button>
-<button class="word" onclick="word()">Word</button>
-<button class="excel" onclick="excel()">Excel</button>
-<button class="em" onclick="excelMes()">E.M</button>
-<button class="wm" onclick="wordMes()">W.M</button>
-<button class="borrar" onclick="borrar()">Borrar</button>
+  <button class="btn-save" onclick="guardar()">Guardar</button>
+  <button class="btn-update" onclick="actualizar()">Actualizar</button>
+
+  <button class="btn-pdf" onclick="pdf()">PDF</button>
+  <button class="btn-word" onclick="word()">Word</button>
+
+  <button class="btn-excel" onclick="excel()">Excel</button>
+  <button class="btn-em" onclick="excelMes()">E.M</button>
+
+  <button class="btn-wm" onclick="wordMes()">W.M</button>
+  <button class="btn-del" onclick="borrar()">Borrar</button>
 </div>
 
-<div class="registros" id="lista"></div>
+<div class="historial" id="historial"></div>
 
 <footer>© 2026 — Sistema GELM — PMT</footer>
-
-</div>
 </div>
 
 <script>
-/* STORAGE AISLADO */
-const KEY="CONSIGNACION_PMT_CONTROL";
+const KEY="CONSIGNACION_PMT_GELM";
 let db=JSON.parse(localStorage.getItem(KEY)||"[]");
 let editIndex=null;
 
-/* FIRMA */
-const c=document.getElementById("firma"),ctx=c.getContext("2d");
-c.width=c.offsetWidth;c.height=c.offsetHeight;
+/* ===== FIRMA ===== */
+const canvas=document.getElementById("firma");
+const ctx=canvas.getContext("2d");
+canvas.width=canvas.offsetWidth;
+canvas.height=canvas.offsetHeight;
 ctx.lineWidth=2;ctx.lineCap="round";
-let d=false;
-c.onpointerdown=e=>{d=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY)};
-c.onpointermove=e=>{if(d){ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke()}};
-c.onpointerup=()=>d=false;
+let draw=false;
+canvas.addEventListener("pointerdown",e=>{draw=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY)});
+canvas.addEventListener("pointermove",e=>{if(draw){ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke()}});
+canvas.addEventListener("pointerup",()=>draw=false);
 
-/* GUARDAR */
+/* ===== GUARDAR ===== */
 function guardar(){
   const r={
-    fecha:fecha.value,hora:hora.value,
-    placas:placas.value,marca:marca.value,
+    fecha:fecha.value,
+    hora:hora.value,
+    placas:placas.value,
+    marca:marca.value,
     motivo:motivo.value,
-    firma:c.toDataURL()
+    firma:canvas.toDataURL()
   };
   db.push(r);
   localStorage.setItem(KEY,JSON.stringify(db));
-  limpiar();render();
+  render();
 }
 
-/* ACTUALIZAR */
+/* ===== ACTUALIZAR ===== */
 function actualizar(){
-  if(editIndex===null)return;
+  if(editIndex===null) return alert("Seleccione un registro");
   db[editIndex]={
-    fecha:fecha.value,hora:hora.value,
-    placas:placas.value,marca:marca.value,
+    fecha:fecha.value,
+    hora:hora.value,
+    placas:placas.value,
+    marca:marca.value,
     motivo:motivo.value,
-    firma:c.toDataURL()
+    firma:canvas.toDataURL()
   };
   localStorage.setItem(KEY,JSON.stringify(db));
   editIndex=null;
-  limpiar();render();
+  render();
 }
 
-/* RENDER */
+/* ===== RENDER ===== */
 function render(){
-  lista.innerHTML="";
+  historial.innerHTML="";
   db.forEach((r,i)=>{
-    lista.innerHTML+=`
-      <div class="reg" onclick="editar(${i})">
-        <strong>${r.fecha}</strong> — ${r.placas}<br>
-        <small>${r.motivo}</small>
-      </div>`;
+    const d=document.createElement("div");
+    d.textContent=`${r.fecha} — ${r.placas} — ${r.motivo}`;
+    d.onclick=()=>{
+      editIndex=i;
+      fecha.value=r.fecha;
+      hora.value=r.hora;
+      placas.value=r.placas;
+      marca.value=r.marca;
+      motivo.value=r.motivo;
+    };
+    historial.appendChild(d);
   });
 }
 render();
 
-/* EDITAR */
-function editar(i){
-  const r=db[i];
-  fecha.value=r.fecha;hora.value=r.hora;
-  placas.value=r.placas;marca.value=r.marca;
-  motivo.value=r.motivo;
-  const img=new Image();
-  img.onload=()=>ctx.drawImage(img,0,0,c.width,c.height);
-  img.src=r.firma;
-  editIndex=i;
-}
-
-/* EXPORTES */
+/* ===== EXPORTS ===== */
 function pdf(){
   if(!db.length)return;
-  const {jsPDF}=window.jspdf;
-  const p=new jsPDF();
   const r=db.at(-1);
-  p.text(`Consignación PMT\n${r.fecha} ${r.hora}\n${r.placas} - ${r.motivo}`,10,20);
-  p.save("consignacion.pdf");
+  const {jsPDF}=window.jspdf;
+  const d=new jsPDF();
+  d.text("CONSIGNACIÓN PMT",105,15,{align:"center"});
+  d.text(`Fecha: ${r.fecha}`,20,30);
+  d.text(`Placas: ${r.placas}`,20,38);
+  d.addImage(r.firma,"PNG",20,50,80,30);
+  d.save("consignacion.pdf");
 }
 function word(){
   if(!db.length)return;
   const r=db.at(-1);
-  const b=new Blob([`${r.fecha} ${r.placas} ${r.motivo}`],{type:"application/msword"});
+  const b=new Blob([JSON.stringify(r,null,2)],{type:"application/msword"});
   const a=document.createElement("a");
   a.href=URL.createObjectURL(b);a.download="consignacion.doc";a.click();
 }
@@ -271,38 +247,34 @@ function excel(){
 }
 function excelMes(){
   const m=new Date().toISOString().slice(0,7);
-  const d=db.filter(r=>r.fecha.startsWith(m));
-  if(!d.length)return;
-  const ws=XLSX.utils.json_to_sheet(d);
+  const f=db.filter(x=>x.fecha?.startsWith(m));
+  if(!f.length)return alert("Sin datos del mes");
+  const ws=XLSX.utils.json_to_sheet(f);
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,m);
   XLSX.writeFile(wb,`consignacion_${m}.xlsx`);
 }
 function wordMes(){
   const m=new Date().toISOString().slice(0,7);
-  const d=db.filter(r=>r.fecha.startsWith(m));
-  if(!d.length)return;
-  let t=`Consignaciones ${m}\n`;
-  d.forEach(r=>t+=`${r.fecha} ${r.placas}\n`);
+  const f=db.filter(x=>x.fecha?.startsWith(m));
+  if(!f.length)return alert("Sin datos del mes");
+  let t=`CONSIGNACIONES ${m}\n\n`;
+  f.forEach(x=>t+=`${x.fecha} ${x.placas}\n`);
   const b=new Blob([t],{type:"application/msword"});
   const a=document.createElement("a");
   a.href=URL.createObjectURL(b);a.download=`consignacion_${m}.doc`;a.click();
 }
 function borrar(){
   if(confirm("¿Borrar todo?")){
-    db=[];localStorage.removeItem(KEY);
-    render();
+    db=[];localStorage.removeItem(KEY);render();
   }
 }
-function limpiar(){
-  fecha.value=hora.value=placas.value=marca.value=motivo.value="";
-  ctx.clearRect(0,0,c.width,c.height);
-}
 
-/* PWA */
+/* ===== PWA ===== */
 if("serviceWorker"in navigator){
   navigator.serviceWorker.register("sw.js");
 }
 </script>
+
 </body>
 </html>
