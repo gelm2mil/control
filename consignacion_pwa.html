@@ -2,14 +2,13 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Consignación de Vehículo — PMT | GELM 2026</title>
 
 <link rel="stylesheet" href="styles.css">
 
-<!-- 🔗 MANIFEST CORRECTO -->
+<!-- MANIFEST -->
 <link rel="manifest" href="manifest-consignacion.json">
 <meta name="theme-color" content="#00ffc8">
 
@@ -18,20 +17,22 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <style>
-/* 🚫 BLOQUEO SOLO PARA MÓVIL HORIZONTAL (NO PC) */
-@media (max-width: 900px) and (orientation: landscape){
-  body::before{
-    content:"⚠️ Este módulo está diseñado solo para uso vertical";
-    position:fixed;
-    inset:0;
-    background:#050109;
-    color:#00ffc8;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    z-index:9999;
-    font-size:1rem;
-  }
+/* AVISO NO BLOQUEANTE (PWA SAFE) */
+.aviso-vertical{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:#050109;
+  color:#00ffc8;
+  align-items:center;
+  justify-content:center;
+  z-index:50;
+  font-size:1rem;
+  text-align:center;
+}
+
+@media (max-width:900px) and (orientation: landscape){
+  .aviso-vertical{ display:flex; }
 }
 
 body{
@@ -55,59 +56,34 @@ body{
 
 .campo{margin-bottom:14px;}
 .campo label{
-  display:block;
-  font-size:.7rem;
-  color:#9cb3d8;
-  margin-bottom:6px;
-  text-transform:uppercase;
+  display:block;font-size:.7rem;color:#9cb3d8;
+  margin-bottom:6px;text-transform:uppercase;
 }
 .campo input,.campo textarea{
-  width:100%;
-  padding:14px;
-  border-radius:999px;
+  width:100%;padding:14px;border-radius:999px;
   border:1px solid rgba(0,255,200,.45);
-  background:#020616;
-  color:#fff;
-  font-size:1rem;
+  background:#020616;color:#fff;font-size:1rem;
 }
 .campo textarea{border-radius:16px;min-height:90px;}
 
-.seccion{
-  margin-top:22px;
-  padding-top:10px;
-  border-top:1px solid rgba(0,255,200,.3);
-}
-.seccion h3{
-  font-size:.75rem;
-  color:#00ffc8;
-  margin-bottom:12px;
-  text-transform:uppercase;
-}
+.seccion{margin-top:22px;padding-top:10px;border-top:1px solid rgba(0,255,200,.3);}
+.seccion h3{font-size:.75rem;color:#00ffc8;margin-bottom:12px;text-transform:uppercase;}
 
 .firmas{display:flex;flex-direction:column;gap:18px;}
 .firma-box label{color:#00ffc8;font-size:.75rem;}
 .firma-box canvas{
-  width:100%;
-  height:200px;
-  background:#fff;
-  border-radius:14px;
-  border:2px dashed rgba(0,255,200,.9);
+  width:100%;height:200px;background:#fff;
+  border-radius:14px;border:2px dashed rgba(0,255,200,.9);
   touch-action:none;
 }
 
 .botones{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  margin-top:22px;
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:12px;margin-top:22px;
 }
 .botones button{
-  padding:16px;
-  border-radius:999px;
-  font-size:1rem;
-  font-weight:bold;
-  border:none;
-  cursor:pointer;
+  padding:16px;border-radius:999px;
+  font-size:1rem;font-weight:bold;border:none;cursor:pointer;
 }
 
 .btn-save{background:#00c98a;}
@@ -115,23 +91,20 @@ body{
 .btn-word{background:#007bff;color:#fff;}
 .btn-excel{background:#28a745;color:#fff;}
 .btn-month{background:#ffaa00;color:#000;}
-.btn-del{
-  background:#ff0033;
-  color:#fff;
-  grid-column:1 / -1;
-}
+.btn-del{background:#ff0033;color:#fff;grid-column:1/-1;}
 
 .registros{margin-top:26px;font-size:.75rem;}
-.registros div{
-  padding:8px;
-  border-bottom:1px solid rgba(0,255,200,.25);
-}
+.registros div{padding:8px;border-bottom:1px solid rgba(0,255,200,.25);}
 
 footer{text-align:center;font-size:10px;opacity:.6;margin-top:18px;}
 </style>
 </head>
 
 <body>
+
+<div class="aviso-vertical">
+⚠️ Este módulo está diseñado solo para uso vertical
+</div>
 
 <div class="consignacion-box">
 
@@ -192,72 +165,7 @@ footer{text-align:center;font-size:10px;opacity:.6;margin-top:18px;}
 <footer>© 2026 — Sistema GELM — PMT</footer>
 </div>
 
-<!-- 🔧 SERVICE WORKER -->
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js");
-  });
-}
-</script>
-
-<!-- 📦 LÓGICA -->
-<script>
-const KEY="CONSIGNACION_PMT_GELM";
-let db=JSON.parse(localStorage.getItem(KEY)||"[]");
-
-/* FIRMAS */
-function firmaCanvas(id){
-  const c=document.getElementById(id);
-  const ctx=c.getContext("2d");
-  c.width=c.offsetWidth;
-  c.height=c.offsetHeight;
-  ctx.lineWidth=2;
-  ctx.lineCap="round";
-  let d=false;
-  c.addEventListener("pointerdown",e=>{
-    d=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);
-  });
-  c.addEventListener("pointermove",e=>{
-    if(!d)return;ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();
-  });
-  c.addEventListener("pointerup",()=>d=false);
-}
-["f1","f2","f3"].forEach(firmaCanvas);
-
-/* GUARDAR */
-function guardar(){
-  db.push({
-    fecha:fecha.value,hora:hora.value,
-    placas:placas.value,marca:marca.value,tipo:tipo.value,color:color.value,
-    nit:nit.value,chasis:chasis.value,motor:motor.value,
-    lugar:lugar.value,motivo:motivo.value,consignado:consignado.value,
-    delegacion:delegacion.value,boleta:boleta.value,grua:grua.value,
-    conductor:{nombre:conductor.value,tipo:lic_tipo.value,doc:doc.value,lic:lic.value},
-    danos:danos.value,
-    firmas:[f1.toDataURL(),f2.toDataURL(),f3.toDataURL()]
-  });
-  localStorage.setItem(KEY,JSON.stringify(db));
-  render();
-}
-
-/* HISTORIAL */
-function render(){
-  tabla.innerHTML=db.map((x,i)=>`
-    <div>${i+1}. ${x.fecha} ${x.placas} — ${x.motivo}</div>
-  `).join("");
-}
-render();
-
-/* BORRAR */
-function borrar(){
-  if(confirm("¿Borrar todo?")){
-    db=[];
-    localStorage.removeItem(KEY);
-    render();
-  }
-}
-</script>
+<!-- SERVICE WORKER (ÚNICO Y CORRECTO) -->
 <script>
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/control/sw.js")
