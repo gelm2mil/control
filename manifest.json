@@ -1,15 +1,22 @@
 {
-  "name": "Control de Asistencia PMT - GELM",
-  "short_name": "Control PMT",
-  "description": "Sistema de control de asistencia PMT - GELM 2026",
-  "start_url": "/control/index.html",
-  "scope": "/control/",
+  "name": "Consignación PMT - GELM 2026",
+  "short_name": "Consignación PMT",
+  "start_url": "./consignacion_pwa.html",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#00ffff",
+  "background_color": "#050109",
+  "theme_color": "#00ffc8",
   "orientation": "portrait",
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }
+
