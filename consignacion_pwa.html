@@ -258,6 +258,13 @@ function borrar(){
   }
 }
 </script>
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/control/sw.js")
+    .then(reg => console.log("SW OK:", reg.scope))
+    .catch(err => console.error("SW ERROR:", err));
+}
+</script>
 
 </body>
 </html>
