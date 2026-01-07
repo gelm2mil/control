@@ -1,16 +1,19 @@
 /* =========================================================
    SERVICE WORKER — CONSIGNACIÓN PMT | GELM 2026
+   Prioridad: consignacion.html / consignacion_pwa.html
    Seguro para firmas, PDF, Word, Excel
 ========================================================= */
 
-const CACHE_NAME = "gelm-consignacion-v1";
+const CACHE_NAME = "gelm-consignacion-v2";
 
-/* Archivos base (SOLO estáticos) */
+/* SOLO archivos críticos */
 const STATIC_ASSETS = [
   "./",
-  "./index.html",
+  "./consignacion.html",
+  "./consignacion_pwa.html",
   "./styles.css",
-  "./manifest.json"
+  "./manifest.json",
+  "./manifest-consignacion.json"
 ];
 
 /* ===== INSTALL ===== */
@@ -38,7 +41,7 @@ self.addEventListener("fetch", event => {
   const req = event.request;
   const url = new URL(req.url);
 
-  /* ❌ NO tocar blobs, data, ni descargas */
+  /* ❌ NO tocar generación de archivos ni firmas */
   if (
     req.method !== "GET" ||
     url.protocol === "blob:" ||
@@ -51,7 +54,18 @@ self.addEventListener("fetch", event => {
     return;
   }
 
-  /* ✅ Network first (para que NO rompa firmas ni botones) */
+  /* ✅ PRIORIDAD: consignación */
+  if (
+    url.pathname.endsWith("/consignacion.html") ||
+    url.pathname.endsWith("/consignacion_pwa.html")
+  ) {
+    event.respondWith(
+      fetch(req).catch(() => caches.match(req))
+    );
+    return;
+  }
+
+  /* ✅ Network first seguro */
   event.respondWith(
     fetch(req)
       .then(res => {
