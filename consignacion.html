@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -51,10 +50,8 @@
   margin-bottom:18px;
 }
 
-/* ===== CAMPOS TIPO AGENDA ===== */
-.campo{
-  margin-bottom:14px;
-}
+/* ===== CAMPOS ===== */
+.campo{margin-bottom:14px;}
 .campo label{
   display:block;
   font-size:.7rem;
@@ -103,7 +100,12 @@
 }
 
 /* ===== BOTONES ===== */
-.botones{display:grid;gap:12px;margin-top:22px;}
+.botones{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:22px;
+}
 .botones button{
   padding:16px;
   border-radius:999px;
@@ -116,9 +118,13 @@
 .btn-word{background:#007bff;color:#fff;}
 .btn-excel{background:#28a745;color:#fff;}
 .btn-month{background:#ffaa00;color:#000;}
-.btn-del{background:#ff0033;color:#fff;}
+.btn-del{
+  background:#ff0033;
+  color:#fff;
+  grid-column:1 / -1;
+}
 
-/* ===== HISTORIAL SIMPLE ===== */
+/* ===== HISTORIAL ===== */
 .registros{
   margin-top:26px;
   font-size:.75rem;
@@ -188,8 +194,8 @@ footer{
   <button class="btn-pdf" onclick="pdf()">PDF</button>
   <button class="btn-word" onclick="word()">Word</button>
   <button class="btn-excel" onclick="excel()">Excel</button>
-  <button class="btn-month" onclick="excelMes()">Excel por mes</button>
-  <button class="btn-month" onclick="wordMes()">Word por mes</button>
+  <button class="btn-month" onclick="excelMes()">E.M</button>
+  <button class="btn-month" onclick="wordMes()">W.M</button>
   <button class="btn-del" onclick="borrar()">Borrar</button>
 </div>
 
@@ -235,7 +241,7 @@ function guardar(){
 /* ===== HISTORIAL ===== */
 function render(){
   tabla.innerHTML=db.map((x,i)=>`
-    <div>${i+1}. ${x.fecha} ${x.hora} — ${x.placas} — ${x.motivo}</div>
+    <div>${i+1}. ${x.fecha} ${x.hora||""} — ${x.placas} — ${x.motivo}</div>
   `).join("");
 }
 render();
@@ -251,14 +257,8 @@ function pdf(){
   Object.entries({
     Fecha:r.fecha, Hora:r.hora, Placas:r.placas, Marca:r.marca, Tipo:r.tipo,
     Color:r.color, NIT:r.nit, Chasis:r.chasis, Motor:r.motor,
-    Lugar:r.lugar, Motivo:r.motivo, Conductor:r.conductor.nombre,
-    Licencia:r.conductor.tipo, Documento:r.conductor.doc, NoLicencia:r.conductor.lic
+    Lugar:r.lugar, Motivo:r.motivo
   }).forEach(([k,v])=>{ d.text(`${k}: ${v||""}`,20,y); y+=5; });
-  d.text("Daños:",20,y); y+=5;
-  d.text(r.danos||"",20,y,{maxWidth:170});
-  d.addImage(r.firmas[0],"PNG",20,220,50,20);
-  d.addImage(r.firmas[1],"PNG",80,220,50,20);
-  d.addImage(r.firmas[2],"PNG",140,220,50,20);
   d.save("consignacion_pmt.pdf");
 }
 
@@ -267,28 +267,10 @@ function word(){
   const r=db.at(-1); if(!r) return;
   const t=`CONSIGNACIÓN DE VEHÍCULO – PMT
 
-Fecha: ${r.fecha}   Hora: ${r.hora}
-Placas: ${r.placas}   Marca: ${r.marca}
-Tipo: ${r.tipo}   Color: ${r.color}
-NIT: ${r.nit}
-Chasis: ${r.chasis}
-Motor: ${r.motor}
-
-Lugar: ${r.lugar}
+Fecha: ${r.fecha} Hora: ${r.hora}
+Placas: ${r.placas}
+Marca: ${r.marca}
 Motivo: ${r.motivo}
-Consignado por: ${r.consignado}
-Delegación: ${r.delegacion}
-Boleta: ${r.boleta}
-Grúa: ${r.grua}
-
-CONDUCTOR
-Nombre: ${r.conductor.nombre}
-Licencia: ${r.conductor.tipo}
-Documento: ${r.conductor.doc}
-No Licencia: ${r.conductor.lic}
-
-DAÑOS:
-${r.danos}
 `;
   const b=new Blob([t],{type:"application/msword"});
   const a=document.createElement("a");
@@ -304,8 +286,33 @@ function excel(){
   XLSX.utils.book_append_sheet(wb,ws,"Consignaciones");
   XLSX.writeFile(wb,"consignacion_pmt.xlsx");
 }
-function excelMes(){ alert("Excel por mes listo"); }
-function wordMes(){ alert("Word por mes listo"); }
+
+/* ===== EXCEL POR MES ===== */
+function excelMes(){
+  const mes=(fecha.value||"").slice(0,7);
+  const f=db.filter(r=>r.fecha.startsWith(mes));
+  if(!f.length){alert("No hay registros de ese mes");return;}
+  const ws=XLSX.utils.json_to_sheet(f);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,mes);
+  XLSX.writeFile(wb,`consignacion_${mes}.xlsx`);
+}
+
+/* ===== WORD POR MES ===== */
+function wordMes(){
+  const mes=(fecha.value||"").slice(0,7);
+  const f=db.filter(r=>r.fecha.startsWith(mes));
+  if(!f.length){alert("No hay registros de ese mes");return;}
+  let t=`CONSIGNACIONES ${mes}\n\n`;
+  f.forEach((r,i)=>{
+    t+=`${i+1}. ${r.fecha} ${r.placas} — ${r.motivo}\n`;
+  });
+  const b=new Blob([t],{type:"application/msword"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(b);
+  a.download=`consignacion_${mes}.doc`;
+  a.click();
+}
 
 /* ===== BORRAR ===== */
 function borrar(){
