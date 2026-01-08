@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Control de Asistencia — PMT</title>
+
+<title>GELM-SYSTEM-2026 | Control de Asistencia PMT</title>
 
 <link rel="stylesheet" href="styles.css">
 <link rel="manifest" href="manifest.json">
@@ -14,6 +15,24 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<style>
+/* GELM – Branding Pro */
+.titulos-linea1{
+  letter-spacing:2px;
+}
+.titulos-linea4{
+  font-size:13px;
+  opacity:.8;
+}
+.system-tag{
+  margin-top:4px;
+  font-size:11px;
+  letter-spacing:3px;
+  color:#00fff0;
+  opacity:.7;
+}
+</style>
 </head>
 
 <body>
@@ -21,16 +40,20 @@
 
 <div class="header-top">
   <div class="logo-box"><img src="icons/icon-192.png"></div>
+
   <div class="titulos">
     <div class="titulos-linea1">CONTROL DE ASISTENCIA — PMT</div>
     <div class="titulos-linea3" id="fechaHora"></div>
-    <div class="titulos-linea4">Sistema GELM 2026</div>
+    <div class="titulos-linea4">Sistema Institucional de Control</div>
+    <div class="system-tag">GELM-SYSTEM-2026</div>
   </div>
+
   <div class="logo-box"><img src="icons/icon-512.png"></div>
 </div>
 
 <div class="panel">
 
+<!-- FORM -->
 <div class="section grid">
   <div><label>Nombre</label><input id="nombre"></div>
 
@@ -80,7 +103,7 @@
 </div>
 
 <div class="section">
-  <label>Firma</label>
+  <label>Firma (obligatoria)</label>
   <canvas id="firma"></canvas>
 </div>
 
@@ -115,39 +138,40 @@ setInterval(()=>fechaHora.innerText=new Date().toLocaleString("es-GT"),1000);
 /* FIRMA */
 const c=firma,ctx=c.getContext("2d");
 c.width=c.offsetWidth;c.height=140;
-let d=false;
-c.onpointerdown=e=>{d=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);}
-c.onpointermove=e=>{if(d){ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();}}
+let d=false, firmaHecha=false;
+
+c.onpointerdown=e=>{
+  d=true;
+  firmaHecha=true;
+  ctx.beginPath();
+  ctx.moveTo(e.offsetX,e.offsetY);
+};
+c.onpointermove=e=>{ if(d){ ctx.lineTo(e.offsetX,e.offsetY); ctx.stroke(); } }
 window.onpointerup=()=>d=false;
 
 /* DB */
 const KEY="ASISTENCIA_PMT_GELM";
 let db=JSON.parse(localStorage.getItem(KEY)||"[]");
 
-/* UTILIDADES */
+/* UTIL */
 function hoy(){return new Date().toISOString().split("T")[0];}
-function registrosHoy(nombre){
-  return db.filter(x=>x.nombre===nombre && x.fecha===hoy());
-}
-function ultimoHoy(nombre){
-  return registrosHoy(nombre).at(-1);
-}
+function registrosHoy(nombre){return db.filter(x=>x.nombre===nombre && x.fecha===hoy());}
+function ultimoHoy(nombre){return registrosHoy(nombre).at(-1);}
 
 /* VALIDADOR */
 function validar(nombre,tipo){
-  const last=ultimoHoy(nombre);
-
   if(["Permiso","Vacaciones","IGSS","Ausente"].includes(tipo)){
     if(!obs.value) return alert("Observación obligatoria");
     return true;
   }
 
+  if(!firmaHecha) return alert("La firma es obligatoria");
+
+  const last=ultimoHoy(nombre);
   if(!last && tipo!=="Entrada"){
     alert("Debe marcar ENTRADA primero");
     return false;
   }
-
-  if(!last) return true;
 
   const flujo={
     "Entrada":["Salida Almuerzo","Salida"],
@@ -156,21 +180,29 @@ function validar(nombre,tipo){
     "Salida":[]
   };
 
-  if(!flujo[last.tipo]?.includes(tipo)){
+  if(last && !flujo[last.tipo]?.includes(tipo)){
     alert(`No puede marcar ${tipo} después de ${last.tipo}`);
     return false;
   }
   return true;
 }
 
-/* ESTADO DIARIO */
+/* ESTADO */
 function estadoDia(nombre){
   const r=registrosHoy(nombre);
   if(!r.length) return "⚫ AUSENTE";
-  const tipos=r.map(x=>x.tipo);
-  if(tipos.includes("Entrada") && tipos.includes("Salida")) return "🟢 COMPLETO";
-  if(tipos.includes("Entrada")) return "🟡 INCOMPLETO";
+  const t=r.map(x=>x.tipo);
+  if(t.includes("Entrada") && t.includes("Salida")) return "🟢 COMPLETO";
+  if(t.includes("Entrada")) return "🟡 INCOMPLETO";
   return "🔴 IRREGULAR";
+}
+
+/* LIMPIAR */
+function limpiar(){
+  nombre.value="";
+  obs.value="";
+  ctx.clearRect(0,0,c.width,c.height);
+  firmaHecha=false;
 }
 
 /* GUARDAR */
@@ -193,6 +225,7 @@ function guardar(){
   db.push(r);
   localStorage.setItem(KEY,JSON.stringify(db));
   render();
+  limpiar();
 
   fetch("https://script.google.com/macros/s/AKfycbxxZNdpp_YF-ZoDygwRbmkAP-jsMBI3Cdsq64aozRjS6Lk0DCSvriBtRmRAoPicZ3hpNQ/exec",{
     method:"POST",
@@ -215,36 +248,19 @@ function render(){
 render();
 
 /* EXPORTS */
-function pdf(){
-  const d=new jspdf.jsPDF();
-  d.text("CONTROL DE ASISTENCIA — PMT",105,15,{align:"center"});
-  db.forEach((x,i)=>{
-    d.text(`${i+1}. ${x.fecha} ${x.hora} ${x.nombre} (${x.tipo})`,20,30+i*8);
-  });
-  d.save("ASISTENCIA_PMT.pdf");
-}
-function word(){
-  let t="CONTROL DE ASISTENCIA — PMT\n\n";
-  db.forEach(x=>t+=`${x.fecha} ${x.hora} ${x.nombre} (${x.tipo})\n`);
-  const b=new Blob([t],{type:"application/msword"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(b);
-  a.download="ASISTENCIA_PMT.doc";
-  a.click();
-}
 function excel(){
-  const ws=XLSX.utils.json_to_sheet(db);
+  const data=db.map(x=>({
+    Fecha:x.fecha, Hora:x.hora, Nombre:x.nombre,
+    Cargo:x.cargo, Grupo:x.grupo, Tipo:x.tipo, Observación:x.obs
+  }));
+  const ws=XLSX.utils.json_to_sheet(data);
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,"Asistencia");
-  XLSX.writeFile(wb,"ASISTENCIA_PMT.xlsx");
+  XLSX.writeFile(wb,"GELM_SYSTEM_2026_ASISTENCIA.xlsx");
 }
-function borrar(){
-  if(confirm("¿BORRAR TODO?")){
-    db=[];
-    localStorage.removeItem(KEY);
-    render();
-  }
-}
+function pdf(){ const d=new jspdf.jsPDF(); d.text("GELM-SYSTEM-2026",105,15,{align:"center"}); db.forEach((x,i)=>d.text(`${i+1}. ${x.nombre} ${x.tipo}`,20,30+i*8)); d.save("ASISTENCIA.pdf"); }
+function word(){ let t="GELM-SYSTEM-2026\n\n"; db.forEach(x=>t+=`${x.nombre} ${x.tipo}\n`); const b=new Blob([t]); const a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download="ASISTENCIA.doc"; a.click(); }
+function borrar(){ if(confirm("¿BORRAR TODO?")){ db=[]; localStorage.removeItem(KEY); render(); } }
 </script>
 </body>
 </html>
