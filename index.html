@@ -6,163 +6,146 @@
 
 <title>Control de Asistencia — PMT</title>
 
-<!-- CSS EXTERNO -->
 <link rel="stylesheet" href="styles.css">
-
-<!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#00fff0">
 
-<!-- ICONOS -->
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 
-<!-- LIBRERÍAS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
 </head>
-<body>
 
+<body>
 <div class="contenedor">
 
-  <!-- ENCABEZADO -->
-  <div class="header-top">
-    <div class="logo-box">
-      <img src="icons/icon-192.png" alt="PMT">
-    </div>
-
-    <div class="titulos">
-      <div class="titulos-linea1">CONTROL DE ASISTENCIA — PMT</div>
-      <div class="titulos-linea3" id="fechaHora"></div>
-      <div class="titulos-linea4">Sistema GELM 2026</div>
-    </div>
-
-    <div class="logo-box">
-      <img src="icons/icon-512.png" alt="GELM">
-    </div>
+<div class="header-top">
+  <div class="logo-box"><img src="icons/icon-192.png"></div>
+  <div class="titulos">
+    <div class="titulos-linea1">CONTROL DE ASISTENCIA — PMT</div>
+    <div class="titulos-linea3" id="fechaHora"></div>
+    <div class="titulos-linea4">Sistema GELM 2026</div>
   </div>
+  <div class="logo-box"><img src="icons/icon-512.png"></div>
+</div>
 
-  <!-- FORMULARIO -->
-  <div class="panel">
+<div class="panel">
 
-    <div class="section grid">
-      <div>
-        <label>Nombre del elemento</label>
-        <input id="nombre">
-      </div>
-
-      <div>
-        <label>Cargo</label>
-        <select id="cargo">
-          <option>Comisario General</option>
-          <option>Subdirector</option>
-          <option>Subcomisario</option>
-          <option>Oficial</option>
-          <option>Secretario</option>
-        </select>
-      </div>
-
-      <div>
-        <label>Grupo</label>
-        <select id="grupo">
-          <option>Dirección</option>
-          <option>Transportes</option>
-          <option>Vía Pública</option>
-          <option>Grupo A</option>
-          <option>Grupo B</option>
-          <option>Oficina</option>
-        </select>
-      </div>
-
-      <div>
-        <label>Tipo de registro</label>
-        <select id="tipo">
-          <option>Entrada</option>
-          <option>Salida</option>
-          <option>Salida Almuerzo</option>
-          <option>Regreso Almuerzo</option>
-          <option>Permiso</option>
-          <option>Vacaciones</option>
-          <option>IGSS</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="section">
-      <label>Observación (obligatoria si aplica)</label>
-      <textarea id="obs" rows="2"></textarea>
-    </div>
-
-    <div class="section">
-      <label>Firma del elemento</label>
-      <canvas id="firma"></canvas>
-    </div>
-
-    <div class="actions">
-      <button class="btn-save" onclick="guardar()">Guardar Registro</button>
-      <button class="btn-pdf" onclick="pdf()">PDF Diario</button>
-      <button class="btn-word" onclick="word()">Word</button>
-      <button class="btn-excel" onclick="excel()">Excel</button>
-      <button class="btn-del" onclick="borrar()">Borrar Todo</button>
-    </div>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Fecha</th>
-          <th>Hora</th>
-          <th>Nombre</th>
-          <th>Cargo</th>
-          <th>Grupo</th>
-          <th>Tipo</th>
-        </tr>
-      </thead>
-      <tbody id="tabla"></tbody>
-    </table>
-
-    <div class="pie">
-      © 2026 — Sistema GELM — Desarrollo y propiedad intelectual reservados
-    </div>
-
+<div class="section grid">
+  <div><label>Nombre</label><input id="nombre"></div>
+  <div>
+    <label>Cargo</label>
+    <select id="cargo">
+      <option>Comisario General</option>
+      <option>Subdirector</option>
+      <option>Subcomisario</option>
+      <option>Oficial</option>
+      <option>Secretario</option>
+    </select>
+  </div>
+  <div>
+    <label>Grupo</label>
+    <select id="grupo">
+      <option>Dirección</option>
+      <option>Transportes</option>
+      <option>Vía Pública</option>
+      <option>Grupo A</option>
+      <option>Grupo B</option>
+      <option>Oficina</option>
+    </select>
+  </div>
+  <div>
+    <label>Tipo</label>
+    <select id="tipo">
+      <option>Entrada</option>
+      <option>Salida Almuerzo</option>
+      <option>Regreso Almuerzo</option>
+      <option>Salida</option>
+      <option>Permiso</option>
+      <option>Vacaciones</option>
+      <option>IGSS</option>
+    </select>
   </div>
 </div>
 
+<div class="section">
+  <label>Observación</label>
+  <textarea id="obs"></textarea>
+</div>
+
+<div class="section">
+  <label>Firma</label>
+  <canvas id="firma"></canvas>
+</div>
+
+<div class="actions">
+  <button class="btn-save" onclick="guardar()">Guardar</button>
+  <button class="btn-pdf" onclick="pdf()">PDF</button>
+  <button class="btn-word" onclick="word()">Word</button>
+  <button class="btn-excel" onclick="excel()">Excel</button>
+  <button class="btn-del" onclick="borrar()">Borrar</button>
+</div>
+
+<table>
+<thead>
+<tr><th>Fecha</th><th>Hora</th><th>Nombre</th><th>Tipo</th></tr>
+</thead>
+<tbody id="tabla"></tbody>
+</table>
+
+</div>
+</div>
+
 <script>
-/* ===============================
-   FECHA Y HORA AUTOMÁTICA
-================================ */
-function actualizarHora(){
-  const f=new Date();
-  document.getElementById("fechaHora").innerText =
-    f.toLocaleDateString("es-GT",{weekday:'long',year:'numeric',month:'long',day:'numeric'}) +
-    " — " + f.toLocaleTimeString("es-GT");
-}
-setInterval(actualizarHora,1000);
-actualizarHora();
+/* FECHA */
+setInterval(()=>fechaHora.innerText=new Date().toLocaleString("es-GT"),1000);
 
-/* ===============================
-   FIRMA
-================================ */
-const c=document.getElementById("firma");
-const ctx=c.getContext("2d");
-c.width=c.offsetWidth;
-c.height=140;
-let dib=false;
-c.onmousedown=e=>{dib=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);}
-c.onmousemove=e=>{if(dib){ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();}}
-window.onmouseup=()=>dib=false;
+/* FIRMA */
+const c=firma,ctx=c.getContext("2d");
+c.width=c.offsetWidth;c.height=140;
+let d=false;
+c.onpointerdown=e=>{d=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY);}
+c.onpointermove=e=>{if(d){ctx.lineTo(e.offsetX,e.offsetY);ctx.stroke();}}
+window.onpointerup=()=>d=false;
 
-/* ===============================
-   BASE LOCAL
-================================ */
+/* DB */
 const KEY="ASISTENCIA_PMT_GELM";
 let db=JSON.parse(localStorage.getItem(KEY)||"[]");
 
-/* ===============================
-   GUARDAR + GOOGLE SHEETS
-================================ */
+/* VALIDADOR DE FLUJO */
+function ultimoRegistroHoy(nombre){
+  const hoy=new Date().toISOString().split("T")[0];
+  return db.filter(x=>x.nombre===nombre && x.fecha===hoy).at(-1);
+}
+
+function validarFlujo(nombre,tipo){
+  const last=ultimoRegistroHoy(nombre);
+  if(!last && tipo!=="Entrada"){
+    alert("Debe marcar ENTRADA primero");
+    return false;
+  }
+  if(!last) return true;
+
+  const flujo={
+    "Entrada":["Salida Almuerzo","Permiso","Vacaciones","IGSS","Salida"],
+    "Salida Almuerzo":["Regreso Almuerzo"],
+    "Regreso Almuerzo":["Salida"],
+    "Salida":[]
+  };
+
+  if(flujo[last.tipo] && !flujo[last.tipo].includes(tipo)){
+    alert(`No puede marcar ${tipo} después de ${last.tipo}`);
+    return false;
+  }
+  return true;
+}
+
+/* GUARDAR */
 function guardar(){
+  if(!nombre.value) return alert("Nombre obligatorio");
+  if(!validarFlujo(nombre.value,tipo.value)) return;
+
   const f=new Date();
   const r={
     fecha:f.toISOString().split("T")[0],
@@ -172,11 +155,8 @@ function guardar(){
     grupo:grupo.value,
     tipo:tipo.value,
     obs:obs.value,
-    firma:c.toDataURL(),
-    userAgent:navigator.userAgent
+    firma:c.toDataURL()
   };
-
-  if(!r.nombre) return alert("Nombre obligatorio");
 
   db.push(r);
   localStorage.setItem(KEY,JSON.stringify(db));
@@ -188,73 +168,19 @@ function guardar(){
   });
 }
 
-/* ===============================
-   RENDER TABLA
-================================ */
+/* TABLA */
 function render(){
   tabla.innerHTML=db.map(x=>`
-    <tr>
-      <td>${x.fecha}</td>
-      <td>${x.hora}</td>
-      <td>${x.nombre}</td>
-      <td>${x.cargo}</td>
-      <td>${x.grupo}</td>
-      <td>${x.tipo}</td>
-    </tr>`).join("");
+    <tr><td>${x.fecha}</td><td>${x.hora}</td><td>${x.nombre}</td><td>${x.tipo}</td></tr>
+  `).join("");
 }
 render();
 
-/* ===============================
-   EXPORTACIONES
-================================ */
-function pdf(){
-  const {jsPDF}=window.jspdf;
-  const d=new jsPDF();
-  d.text("CONTROL DE ASISTENCIA — PMT",105,15,{align:"center"});
-  db.forEach((x,i)=>{
-    d.text(`${i+1}. ${x.fecha} ${x.hora} — ${x.nombre} (${x.tipo})`,20,30+i*8);
-  });
-  d.save("CONTROL_ASISTENCIA_PMT.pdf");
-}
-
-function word(){
-  let t="CONTROL DE ASISTENCIA — PMT\n\n";
-  db.forEach((x,i)=>{
-    t+=`${i+1}. ${x.fecha} ${x.hora} - ${x.nombre} (${x.tipo})\n`;
-  });
-  const b=new Blob([t],{type:"application/msword"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(b);
-  a.download="CONTROL_ASISTENCIA_PMT.doc";
-  a.click();
-}
-
-function excel(){
-  const ws=XLSX.utils.json_to_sheet(db);
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,"Asistencia");
-  XLSX.writeFile(wb,"CONTROL_ASISTENCIA_PMT.xlsx");
-}
-
-function borrar(){
-  if(confirm("¿BORRAR TODO?")){
-    db=[];
-    localStorage.removeItem(KEY);
-    render();
-  }
-}
-</script>
-
-<!-- SERVICE WORKER -->
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register("sw.js")
-      .then(() => console.log("✔ Service Worker GELM activo"))
-      .catch(err => console.error("❌ Error SW:", err));
-  });
-}
+/* EXPORTS */
+function pdf(){const d=new jspdf.jsPDF();db.forEach((x,i)=>d.text(`${i+1}. ${x.nombre} ${x.tipo}`,20,20+i*8));d.save("ASISTENCIA.pdf");}
+function word(){let t="ASISTENCIA\n";db.forEach(x=>t+=`${x.nombre} ${x.tipo}\n`);const b=new Blob([t]);const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="ASISTENCIA.doc";a.click();}
+function excel(){const ws=XLSX.utils.json_to_sheet(db);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Asistencia");XLSX.writeFile(wb,"ASISTENCIA.xlsx");}
+function borrar(){if(confirm("¿BORRAR TODO?")){db=[];localStorage.removeItem(KEY);render();}}
 </script>
 
 </body>
