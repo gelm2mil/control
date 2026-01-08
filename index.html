@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Control de Asistencia — PMT</title>
 
 <link rel="stylesheet" href="styles.css">
@@ -34,6 +33,7 @@
 
 <div class="section grid">
   <div><label>Nombre</label><input id="nombre"></div>
+
   <div>
     <label>Cargo</label>
     <select id="cargo">
@@ -44,6 +44,7 @@
       <option>Secretario</option>
     </select>
   </div>
+
   <div>
     <label>Grupo</label>
     <select id="grupo">
@@ -55,6 +56,7 @@
       <option>Oficina</option>
     </select>
   </div>
+
   <div>
     <label>Tipo</label>
     <select id="tipo">
@@ -65,6 +67,7 @@
       <option>Permiso</option>
       <option>Vacaciones</option>
       <option>IGSS</option>
+      <option>Ausente</option>
     </select>
   </div>
 </div>
@@ -89,7 +92,13 @@
 
 <table>
 <thead>
-<tr><th>Fecha</th><th>Hora</th><th>Nombre</th><th>Tipo</th></tr>
+<tr>
+  <th>Fecha</th>
+  <th>Hora</th>
+  <th>Nombre</th>
+  <th>Tipo</th>
+  <th>Estado</th>
+</tr>
 </thead>
 <tbody id="tabla"></tbody>
 </table>
@@ -113,49 +122,70 @@ window.onpointerup=()=>d=false;
 const KEY="ASISTENCIA_PMT_GELM";
 let db=JSON.parse(localStorage.getItem(KEY)||"[]");
 
-/* VALIDADOR DE FLUJO */
-function ultimoRegistroHoy(nombre){
-  const hoy=new Date().toISOString().split("T")[0];
-  return db.filter(x=>x.nombre===nombre && x.fecha===hoy).at(-1);
+/* UTILIDADES */
+function hoy(){return new Date().toISOString().split("T")[0];}
+function registrosHoy(nombre){
+  return db.filter(x=>x.nombre===nombre && x.fecha===hoy());
+}
+function ultimoHoy(nombre){
+  return registrosHoy(nombre).at(-1);
 }
 
-function validarFlujo(nombre,tipo){
-  const last=ultimoRegistroHoy(nombre);
+/* VALIDADOR */
+function validar(nombre,tipo){
+  const last=ultimoHoy(nombre);
+
+  if(["Permiso","Vacaciones","IGSS","Ausente"].includes(tipo)){
+    if(!obs.value) return alert("Observación obligatoria");
+    return true;
+  }
+
   if(!last && tipo!=="Entrada"){
     alert("Debe marcar ENTRADA primero");
     return false;
   }
+
   if(!last) return true;
 
   const flujo={
-    "Entrada":["Salida Almuerzo","Permiso","Vacaciones","IGSS","Salida"],
+    "Entrada":["Salida Almuerzo","Salida"],
     "Salida Almuerzo":["Regreso Almuerzo"],
     "Regreso Almuerzo":["Salida"],
     "Salida":[]
   };
 
-  if(flujo[last.tipo] && !flujo[last.tipo].includes(tipo)){
+  if(!flujo[last.tipo]?.includes(tipo)){
     alert(`No puede marcar ${tipo} después de ${last.tipo}`);
     return false;
   }
   return true;
 }
 
+/* ESTADO DIARIO */
+function estadoDia(nombre){
+  const r=registrosHoy(nombre);
+  if(!r.length) return "⚫ AUSENTE";
+  const tipos=r.map(x=>x.tipo);
+  if(tipos.includes("Entrada") && tipos.includes("Salida")) return "🟢 COMPLETO";
+  if(tipos.includes("Entrada")) return "🟡 INCOMPLETO";
+  return "🔴 IRREGULAR";
+}
+
 /* GUARDAR */
 function guardar(){
   if(!nombre.value) return alert("Nombre obligatorio");
-  if(!validarFlujo(nombre.value,tipo.value)) return;
+  if(!validar(nombre.value,tipo.value)) return;
 
   const f=new Date();
   const r={
-    fecha:f.toISOString().split("T")[0],
+    fecha:hoy(),
     hora:f.toLocaleTimeString("es-GT"),
     nombre:nombre.value,
     cargo:cargo.value,
     grupo:grupo.value,
     tipo:tipo.value,
     obs:obs.value,
-    firma:c.toDataURL()
+    firma: tipo==="Ausente" ? "" : c.toDataURL()
   };
 
   db.push(r);
@@ -171,17 +201,48 @@ function guardar(){
 /* TABLA */
 function render(){
   tabla.innerHTML=db.map(x=>`
-    <tr><td>${x.fecha}</td><td>${x.hora}</td><td>${x.nombre}</td><td>${x.tipo}</td></tr>
+    <tr>
+      <td>${x.fecha}</td>
+      <td>${x.hora}</td>
+      <td>${x.nombre}</td>
+      <td>${x.tipo}</td>
+      <td>${estadoDia(x.nombre)}</td>
+    </tr>
   `).join("");
 }
 render();
 
 /* EXPORTS */
-function pdf(){const d=new jspdf.jsPDF();db.forEach((x,i)=>d.text(`${i+1}. ${x.nombre} ${x.tipo}`,20,20+i*8));d.save("ASISTENCIA.pdf");}
-function word(){let t="ASISTENCIA\n";db.forEach(x=>t+=`${x.nombre} ${x.tipo}\n`);const b=new Blob([t]);const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="ASISTENCIA.doc";a.click();}
-function excel(){const ws=XLSX.utils.json_to_sheet(db);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Asistencia");XLSX.writeFile(wb,"ASISTENCIA.xlsx");}
-function borrar(){if(confirm("¿BORRAR TODO?")){db=[];localStorage.removeItem(KEY);render();}}
+function pdf(){
+  const d=new jspdf.jsPDF();
+  d.text("CONTROL DE ASISTENCIA — PMT",105,15,{align:"center"});
+  db.forEach((x,i)=>{
+    d.text(`${i+1}. ${x.fecha} ${x.hora} ${x.nombre} (${x.tipo})`,20,30+i*8);
+  });
+  d.save("ASISTENCIA_PMT.pdf");
+}
+function word(){
+  let t="CONTROL DE ASISTENCIA — PMT\n\n";
+  db.forEach(x=>t+=`${x.fecha} ${x.hora} ${x.nombre} (${x.tipo})\n`);
+  const b=new Blob([t],{type:"application/msword"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(b);
+  a.download="ASISTENCIA_PMT.doc";
+  a.click();
+}
+function excel(){
+  const ws=XLSX.utils.json_to_sheet(db);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"Asistencia");
+  XLSX.writeFile(wb,"ASISTENCIA_PMT.xlsx");
+}
+function borrar(){
+  if(confirm("¿BORRAR TODO?")){
+    db=[];
+    localStorage.removeItem(KEY);
+    render();
+  }
+}
 </script>
-
 </body>
 </html>
